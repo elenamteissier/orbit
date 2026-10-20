@@ -1,0 +1,8 @@
+Repository description (the "About" box, 350 chars max):
+
+A space-themed progress tracker in a single HTML file. Projects are planets, sub-projects are moons, tasks are stars, with a due-date timeline. No install, no server — your data stays in your browser.
+
+Website (if you enable GitHub Pages): https://<your-username>.github.io/<repo-name>/
+
+Topics:
+productivity, progress-tracker, task-manager, todo, timeline, solar-system, vanilla-javascript, single-file, local-first, no-dependencies
