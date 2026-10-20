@@ -42,6 +42,12 @@ Browser storage is per browser and per file location, so use **Link file** or **
 
 Plain HTML, CSS and JavaScript — no dependencies, no build step. Everything lives in `index.html`.
 
+## Feedback
+
+Ideas, bugs or just a hello? I'd love to hear it:
+- 💬 [Start a discussion](https://github.com/elenamteissier/orbit/discussions)
+- 🐛 [Report an issue](https://github.com/elenamteissier/orbit/issues)
+
 ## License
 
 MIT — © 2026 Elena Teissier. See [LICENSE](LICENSE).
