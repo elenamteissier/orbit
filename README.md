@@ -71,5 +71,4 @@ MIT — © 2026 Elena Teissier. See [LICENSE](LICENSE).
 ## Contributors
 
 - Elena Teissier
-- - Claude (Anthropic)
-  - 
+- Claude (Anthropic)
