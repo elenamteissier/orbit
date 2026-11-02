@@ -1,0 +1,691 @@
+<!doctype html>
+<!-- Orbit Week — © 2026 Elena Teissier. Released under the MIT License. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week · Orbit</title>
+<meta name="author" content="Elena Teissier">
+<style>
+:root{
+  --t:#2de2c5;--v:#9b5cff;--tr:45,226,197;--vr:155,92,255;--hr:120,255,230;--g:#ffb703;--r:#ff6b5e;--b:#3a7bff;
+  --ink:#eef1ff;--dim:rgba(238,241,255,.55);--card:rgba(255,255,255,.04);--line:rgba(255,255,255,.1);
+}
+#palwrap{position:relative}
+#palpop{max-height:70vh;overflow:auto;position:absolute;right:0;top:calc(100% + 8px);z-index:70;display:none;background:rgba(14,20,40,.97);border:1px solid rgba(var(--tr),.4);border-radius:14px;padding:8px;min-width:210px;white-space:nowrap;box-shadow:0 20px 50px rgba(0,0,0,.6)}
+#palpop .psep{height:1px;background:rgba(255,255,255,.1);margin:5px 0}
+#palpop.open{display:block}
+#palpop button{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;padding:7px 8px;border-radius:9px;text-align:left}
+#palpop button:hover,#palpop button.on{background:rgba(255,255,255,.07)}
+#palpop i{display:inline-flex}#palpop i b{width:12px;height:12px;border-radius:50%;margin-left:-3px;border:1px solid rgba(0,0,0,.4)}
+.pls{width:100%;margin-top:6px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:10px;padding:4px;color:var(--ink);outline:0;font-size:12px}.pls option{padding:4px 6px;border-radius:6px}.pls option:checked{background:rgba(var(--tr),.3)}
+.tk.timed{border-color:rgba(var(--vr),.6);background:rgba(var(--vr),.09)}.pill.orb.go{cursor:pointer}.pill.orb.go:hover{background:rgba(var(--vr),.25);color:#fff}
+.pill.tmp{border-color:rgba(var(--vr),.7);color:#d9c2ff}
+.tm input[type=time]{background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:6px;padding:3px 5px;color-scheme:dark;font-size:11px}
+.allbar{display:flex;justify-content:flex-end;margin:0 0 6px}
+.fx.ev{border-style:solid;border-color:rgba(var(--vr),.55);background:rgba(var(--vr),.1);cursor:pointer;color:var(--ink)}
+.fx.ev:hover{background:rgba(var(--vr),.2)}.fx.ev .tm{display:block;color:var(--dim);font-size:10px;margin-top:2px}
+.card input.tm2{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:10px;padding:9px 10px;outline:0;color-scheme:dark}
+.evrow{display:flex;gap:10px}.evrow .fld{flex:1}
+.dadd{display:flex;gap:6px;align-items:center}.dadd input{flex:1;min-width:0}.dadd .evb{background:none;border:1px dashed rgba(var(--vr),.5);color:var(--dim);border-radius:8px;padding:4px 7px;font-size:11px}.dadd .evb:hover{color:var(--ink);border-color:var(--v)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:radial-gradient(ellipse at 50% -10%,#0d1a2b 0%,#05070b 65%) #05070b;color:var(--ink);
+  font-family:"JetBrains Mono","SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+body{overflow-x:hidden}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+
+/* ---------- world background ---------- */
+.bg{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+.bg .star{position:absolute;border-radius:50%;background:#fff;animation:tw ease-in-out infinite alternate}
+@keyframes tw{from{opacity:.12;transform:scale(.7)}to{opacity:.95;transform:scale(1.25)}}
+.bg .glow{position:absolute;width:70vmax;height:70vmax;border-radius:50%;filter:blur(140px);opacity:.09;animation:drift 28s ease-in-out infinite alternate}
+.bg .g1{background:var(--t);left:-20vmax;top:-25vmax}
+.bg .g2{background:var(--v);right:-25vmax;top:5vmax;animation-delay:-11s}
+@keyframes drift{to{transform:translate(7vmax,5vmax) scale(1.15)}}
+.bg .world{position:absolute;left:50%;bottom:-78vmin;width:150vmin;height:150vmin;margin-left:-75vmin;border-radius:50%;
+  background:radial-gradient(circle at 50% 6%,rgba(var(--tr),.2),rgba(var(--vr),.1) 30%,rgba(5,7,11,0) 58%);
+  border-top:1px solid rgba(var(--hr),.28);box-shadow:inset 0 3px 60px rgba(var(--hr),.18),0 -10px 120px rgba(var(--tr),.12)}
+#warpfx{position:fixed;inset:0;z-index:99;pointer-events:none;opacity:0;transition:opacity .55s ease-in;
+  background:radial-gradient(circle at 50% 50%,rgba(255,200,80,.6),rgba(var(--vr),.4) 38%,#05070b 78%)}
+#warpfx.arrive{opacity:1;transition:none;background:radial-gradient(circle at 50% 50%,rgba(var(--tr),.55),rgba(var(--vr),.4) 38%,#05070b 78%)}
+body.warp-out #warpfx{opacity:1}
+body.warp-out header,body.warp-out main{transition:transform .55s ease-in,opacity .55s,filter .55s;transform:scale(1.3);opacity:0;filter:blur(12px) brightness(1.6)}
+@keyframes arrive{from{opacity:0;transform:scale(.86);filter:blur(10px) brightness(1.5)}60%{filter:blur(0) brightness(1.1)}to{opacity:1;transform:none;filter:none}}
+main,header{animation:arrive .9s cubic-bezier(.16,.84,.24,1)}
+
+/* ---------- header ---------- */
+header{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:12px 18px;
+  background:linear-gradient(180deg,rgba(6,10,22,.92),rgba(6,10,22,.55) 70%,transparent)}
+.title{font-size:15px;letter-spacing:6px;text-transform:uppercase;margin-left:6px}
+.title b{color:var(--t);font-weight:400}
+.grow{flex:1}
+.btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:8px;padding:8px 14px;backdrop-filter:blur(8px);transition:.2s;white-space:nowrap}
+.btn:hover{background:rgba(255,255,255,.16);transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,var(--t),#6ad1ff);border:0;color:#04121a;font-weight:700}
+.btn.small{padding:5px 10px;font-size:12px}
+.btn.ghost{background:none}
+.btn.on{background:rgba(var(--tr),.18);border-color:rgba(var(--tr),.6);color:var(--t)}
+main{position:relative;z-index:5;padding:6px 18px 60px;max-width:1700px;margin:0 auto}
+
+/* ---------- week header ---------- */
+#top{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center;margin:8px 0 18px}
+.wk small{display:block;letter-spacing:4px;font-size:11px;color:var(--t);text-transform:uppercase;margin-bottom:2px}
+.wk .range{font-size:28px;font-weight:300;letter-spacing:2px}
+.wk .nav{display:flex;gap:6px;margin-top:8px}
+.focus{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.focus label{display:block;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+.focus input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:0}
+.focus input:focus{border-color:var(--t);box-shadow:0 0 0 3px rgba(var(--tr),.12)}
+.wsum{display:flex;align-items:center;gap:14px}
+.worb{position:relative;width:78px;height:78px;flex:none}
+.worb svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.worb .in{position:absolute;inset:9px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.18)}
+.worb .fill,.dorb .fill{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,var(--t),#1aa89a);transition:height .6s}
+.worb .num{position:absolute;inset:0;display:grid;place-items:center;font-size:15px;font-weight:700;text-shadow:0 1px 6px #000}
+.wsum .txt{font-size:12px;line-height:1.7;color:var(--dim)}
+.wsum .txt b{color:var(--ink);font-weight:600}
+
+/* ---------- board ---------- */
+#board{display:grid;grid-template-columns:244px 1fr;gap:16px;align-items:start}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;backdrop-filter:blur(10px)}
+#backlog{padding:14px;position:sticky;top:70px;max-height:calc(100vh - 90px);display:flex;flex-direction:column}
+#backlog h3,.dh .nm{margin:0}
+.bh{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+.bh h3{font-size:11px;letter-spacing:4px;text-transform:uppercase;font-weight:400;color:var(--t)}
+.bh span{color:var(--dim);font-size:11px}
+.acts{display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap}
+#blist{overflow-y:auto;flex:1;min-height:60px;padding-bottom:6px}
+.addrow{display:flex;gap:6px;margin-bottom:10px}
+.addrow input{flex:1;min-width:0;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:7px 9px;outline:0}
+.addrow input:focus{border-color:var(--t)}
+#days{display:grid;grid-template-columns:repeat(7,minmax(150px,1fr));gap:12px;overflow-x:auto;padding:2px 2px 14px}
+.day{padding:12px;display:flex;flex-direction:column;min-height:430px;transition:border-color .3s,box-shadow .3s}
+.day.today{border-color:rgba(255,183,3,.6);box-shadow:0 0 0 1px rgba(255,183,3,.25),0 0 40px rgba(255,183,3,.12)}
+.day.past{opacity:.62}
+.day.over{border-color:rgba(255,107,94,.5)}
+.day.dropping{border-color:var(--t);box-shadow:0 0 0 2px rgba(var(--tr),.35)}
+.dh{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.dorb{position:relative;width:46px;height:46px;flex:none}
+.dorb svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.dorb .in{position:absolute;inset:7px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.2)}
+.day.today .dorb .in{background:rgba(255,183,3,.18);border-color:rgba(255,183,3,.8);box-shadow:0 0 18px rgba(255,183,3,.45)}
+.day.today .dorb .fill{background:linear-gradient(180deg,#ffd166,var(--g))}
+.dd{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--dim)}
+.day.today .dd{color:var(--g)}
+.dn{font-size:21px;line-height:1.1;font-weight:300}
+.dc{margin-left:auto;text-align:right;font-size:11px;color:var(--dim);line-height:1.5}
+.dc b{color:var(--ink);font-weight:600}
+.dc.warn b{color:var(--r)}
+.dl{flex:1;min-height:120px;display:flex;flex-direction:column;gap:6px}
+.fx{font-size:11px;padding:7px 9px;border-radius:9px;color:var(--dim);border:1px dashed rgba(255,255,255,.22);
+  background:repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 6px,transparent 6px 12px)}
+.fx b{color:var(--ink);font-weight:500}
+.tk{position:relative;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:11px;padding:8px 9px;cursor:grab;transition:background .2s,border-color .2s}
+.tk:hover{background:rgba(255,255,255,.1)}
+.tk.drag{opacity:.35}
+.tk.done{opacity:.5}
+.tk.done .t-text{text-decoration:line-through}
+.tk.late{border-color:rgba(255,107,94,.55)}
+.tr{display:flex;align-items:flex-start;gap:7px}
+.tr .t-chk{margin-top:2px}
+.t-chk{accent-color:var(--t);width:15px;height:15px;flex:none;cursor:pointer}
+.t-text{flex:1;min-width:0;background:transparent;border:0;outline:0;padding:1px 2px;resize:none;overflow:hidden;line-height:1.4;font:inherit;color:var(--ink);display:block;width:100%}
+.bl{background:none;border:0;padding:0 2px;color:var(--t);letter-spacing:1px;font-size:11px;white-space:nowrap}
+.mn{background:none;border:0;color:var(--dim);padding:0 2px;font-size:15px;line-height:1;margin-left:auto}
+.mn:hover{color:var(--ink)}
+.meta{display:flex;align-items:center;gap:6px;margin:4px 0 0 22px;font-size:10px;color:var(--dim);flex-wrap:wrap}
+.pills{display:flex;gap:5px;flex-wrap:wrap}
+.pill{padding:1px 7px;border-radius:99px;border:1px solid rgba(255,255,255,.18)}
+.pill.late{border-color:var(--r);color:#ff9a8f}
+.pill.soon{border-color:var(--g);color:#ffd166}
+.pill.orb{border-color:rgba(var(--vr),.6);color:#c8a6ff}
+.tm{display:none;margin:8px 0 0 22px;font-size:11px;gap:6px;flex-wrap:wrap;align-items:center}
+.tk.menu .tm{display:flex}
+.tm label{color:var(--dim)}
+.tm input[type=date]{background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:6px;padding:3px 5px;color-scheme:dark;font-size:11px}
+.tm button{background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:11px}
+.tm .rm{border-color:rgba(255,107,94,.5);color:#ff9a8f}
+.dadd{margin-top:8px}
+.dadd input{width:100%;background:transparent;border:1px dashed rgba(255,255,255,.18);border-radius:9px;padding:7px 9px;outline:0;color:var(--ink)}
+.dadd input:focus{border-style:solid;border-color:var(--t);background:rgba(255,255,255,.04)}
+.empty{color:var(--dim);font-size:12px;padding:10px 4px;opacity:.7}
+.slot{height:3px;border-radius:3px;background:var(--t);box-shadow:0 0 10px var(--t);margin:-1px 0}
+
+/* ---------- modal ---------- */
+.ov{position:fixed;inset:0;z-index:60;background:rgba(3,5,10,.7);backdrop-filter:blur(8px);display:flex;overflow:auto;padding:20px;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.card{margin:auto;width:min(580px,94vw);background:rgba(14,20,40,.96);border:1px solid rgba(var(--tr),.35);border-radius:20px;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(var(--tr),.1);animation:rise .4s cubic-bezier(.3,1.4,.5,1)}
+@keyframes rise{from{opacity:0;transform:translateY(16px) scale(.97)}}
+.card h2{margin:0 0 4px;font-weight:300;letter-spacing:4px;text-transform:uppercase;font-size:17px}
+.card .sub{color:var(--dim);margin:0 0 16px;line-height:1.6}
+.steps{display:flex;gap:6px;margin-bottom:14px}
+.steps i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.12)}
+.steps i.on{background:var(--t);box-shadow:0 0 8px var(--t)}
+.fld{margin:10px 0}
+.fld label{display:block;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+.fld input[type=text],.fld input:not([type]),.card input.tx{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:0}
+.sec{margin:16px 0 6px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--t)}
+.pick{display:flex;align-items:center;gap:9px;padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.07);font-size:12.5px}
+.pick input{accent-color:var(--t)}
+.pick .w{margin-left:auto;color:var(--dim);font-size:10px;text-align:right}
+.picks{max-height:210px;overflow-y:auto}
+.row{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.cap{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cap div{text-align:center;font-size:10px;color:var(--dim)}
+.cap input{width:100%;text-align:center;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:8px;padding:6px 0;outline:0}
+.rowf{display:flex;gap:6px;margin:6px 0;align-items:center}
+.rowf input,.rowf select{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:8px;padding:6px 8px;outline:0;min-width:0;color-scheme:dark}
+.rowf input.l{flex:1}.rowf input.n{width:56px;text-align:center}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:80;background:rgba(14,20,40,.95);border:1px solid rgba(var(--tr),.5);padding:10px 18px;border-radius:99px;animation:rise .3s}
+
+@media (max-width:1000px){
+  #top{grid-template-columns:1fr}
+  #board{grid-template-columns:1fr}
+  #backlog{position:static;max-height:none}
+  .focus{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="bg" id="bg"><div class="glow g1"></div><div class="glow g2"></div><div class="world"></div></div>
+<div id="warpfx" class="arrive"></div>
+
+<header>
+  <a class="btn" id="back" href="index.html?from=week" title="Back to your Orbit">← Orbit</a>
+  <div class="title">Week <b>World</b></div>
+  <span class="grow"></span>
+  <span id="palwrap"><button class="btn" id="palbtn" title="Color palette">Palette</button><div id="palpop"></div></span>
+  <button class="btn" id="evbtn" title="Add a one-off event (meeting, appointment, trip…)">+ Event</button>
+  <button class="btn" id="setup" title="Focus blocks per day, fixed commitments, weekly routines">Setup</button>
+  <button class="btn" id="lf">Link file</button>
+  <button class="btn" id="exp" title="Download backup">Save</button>
+  <button class="btn" id="imp" title="Load backup">Load</button>
+  <input type="file" id="file" accept=".json" hidden>
+  <button class="btn primary" id="plan">✦ Plan my week</button>
+</header>
+
+<main>
+  <section id="top"></section>
+  <div id="board">
+    <aside id="backlog" class="panel"></aside>
+    <div id="days"></div>
+  </div>
+</main>
+
+<script>
+/* ============ data ============ */
+const KEY='week-v1';
+const $=(s,r=document)=>r.querySelector(s);
+const uid=()=>Math.random().toString(36).slice(2,9);
+const iso=d=>d.toLocaleDateString('sv-SE');
+const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const addDays=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return iso(d)};
+const mondayOf=s=>{const d=parse(s);d.setDate(d.getDate()-((d.getDay()+6)%7));return iso(d)};
+const today=()=>iso(new Date());
+const DN=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fmt=s=>{const d=parse(s);return d.getDate()+' '+MN[d.getMonth()]};
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function isoWeek(s){const d=parse(s);d.setDate(d.getDate()+3-((d.getDay()+6)%7));const y=new Date(d.getFullYear(),0,4);return 1+Math.round(((d-y)/864e5-3+((y.getDay()+6)%7))/7)}
+
+function defaults(){return{
+  tasks:[],events:[],focus:{},
+  cap:[7,7,7,7,7,6,3],                       // 50-min focus blocks per day, Mon..Sun (Sat later start, Sun = buffer)
+  fixed:[{id:uid(),dow:2,label:'Example lecture · 10–12',blocks:2},{id:uid(),dow:4,label:'Example lab · 13–17',blocks:4}],
+  routines:[{id:uid(),text:'Clean the apartment',blocks:1,dow:6},{id:uid(),text:'Groceries',blocks:1,dow:6}],
+  snap:[]
+}}
+const PALETTES={
+  Spectrum:['#12d6ff','#3a7bff','#9b5cff','#ff4fd8','#ff3b5c','#ff8a1f','#ffd400','#3be36b'],
+  Nebula:['#7c4dff','#00e5ff','#ff2d95','#536dfe','#1de9b6','#ff6e40','#b388ff','#40c4ff'],
+  Aurora:['#00f5a0','#00d9f5','#7b61ff','#c04dff','#00e0b8','#4dffb0','#5aa9ff','#b8ff6a'],
+  Ocean:['#00c6ff','#0072ff','#00d4aa','#4facfe','#0fd3d3','#2b5cff','#7ee8fa','#00e5ff'],
+  Lagoon:['#00e5c3','#00b8ff','#2979ff','#00e676','#76ff03','#18ffff','#651fff','#ffea00'],
+  Neon:['#00f5ff','#39ff14','#ff10f0','#fff700','#ff3131','#1f51ff','#bc13fe','#ff9100'],
+  Cyber:['#ff2bd6','#00f0ff','#fcee0a','#7a5cff','#ff3366','#00ff9c','#ff8a00','#2d7bff'],
+  Galaxy:['#6a5cff','#a259ff','#3dd5f3','#ff5fa2','#4f46e5','#22d3ee','#c084fc','#818cf8'],
+  Sunset:['#ff7e5f','#feb47b','#ff4e50','#f9d423','#ff6a88','#c84b9e','#7b4397','#ffa751'],
+  Solar:['#ffb300','#ff6d00','#ff3d00','#ffd54f','#ff8a65','#ff1744','#ffea00','#ffab40'],
+  Ember:['#ff5a1f','#ff9f1c','#ff3b30','#ffcf33','#e63946','#ff7b54','#ffb347','#d62828'],
+  Retro:['#ff6b35','#f7c548','#2ec4b6','#e71d36','#4d908e','#ff9f1c','#577590','#f9844a'],
+  Forest:['#2dd36f','#7ed957','#00b894','#b2d235','#1fa87a','#f2c94c','#6fcf97','#a3e635'],
+  Earth:['#e07a5f','#81b29a','#f2cc8f','#8d99ae','#e9c46a','#2a9d8f','#f4a261','#bc6c25'],
+  Ice:['#a5f3fc','#7dd3fc','#93c5fd','#c4b5fd','#e0f2fe','#67e8f9','#bae6fd','#ddd6fe'],
+  Mono:['#ffffff','#d4d4d8','#a1a1aa','#71717a','#e4e4e7','#bfc3ca','#8d939c','#f4f4f5']
+};
+const hex2rgb=h=>{h=h.replace('#','');return[0,2,4].map(i=>parseInt(h.slice(i,i+2),16))};
+const lighten=(h,k)=>hex2rgb(h).map(v=>Math.round(v+(255-v)*k));
+function palKey(){const k=(typeof S!=='undefined'&&S&&S.palette)||'orbit';if(k==='orbit'){const o=orbitRead();const n=o&&o.s.palette;return PALETTES[n]?n:'Spectrum'}return PALETTES[k]?k:'Spectrum'}
+const ACC=()=>PALETTES[palKey()][0];
+function applyPal(){const c=PALETTES[palKey()],r=document.documentElement.style;
+ r.setProperty('--t',c[0]);r.setProperty('--b',c[1]);r.setProperty('--v',c[2]);r.setProperty('--r',c[4]);r.setProperty('--g',c[6]);
+ r.setProperty('--tr',hex2rgb(c[0]).join(','));r.setProperty('--vr',hex2rgb(c[2]).join(','));r.setProperty('--hr',lighten(c[0],.45).join(','))}
+function fixTA(s){if(!Array.isArray(s.events))s.events=[];if(!Array.isArray(s.fixed))s.fixed=[];return s}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.tasks))return fixTA(Object.assign(defaults(),s))}catch(e){}return null}
+let S=load()||defaults();
+let view=mondayOf(today());
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(window.fileSync)window.fileSync();try{pushPlans()}catch(e){}}
+
+/* ============ capacity helpers ============ */
+const dayIso=i=>addDays(view,i);
+const toMin=t=>{const m=/^(\d{1,2}):(\d{2})$/.exec(t||'');return m?+m[1]*60+ +m[2]:null};
+const evBlocks=e=>{const a=toMin(e.start),b=toMin(e.end);return a!=null&&b!=null&&b>a?Math.max(1,Math.round((b-a)/60)):0};
+const eventsOn=d=>(S.events||[]).filter(e=>e.date===d).sort((a,b)=>(a.start||'')<(b.start||'')?-1:1);
+const fixedBlocks=i=>S.fixed.filter(f=>f.dow===i+1).reduce((a,f)=>a+(+f.blocks||0),0)+eventsOn(dayIso(i)).reduce((a,e)=>a+evBlocks(e),0);
+const tasksOn=d=>S.tasks.filter(t=>t.day===d).sort((a,b)=>(a.time||'99:99')<(b.time||'99:99')?-1:(a.time||'99:99')>(b.time||'99:99')?1:0);
+const plannedBlocks=d=>tasksOn(d).reduce((a,t)=>a+(+t.blocks||1),0);
+const freeOn=(i,d)=>S.cap[i]-fixedBlocks(i)-plannedBlocks(d);
+
+/* ============ render ============ */
+function render(){renderTop();renderBacklog();renderDays()}
+
+function renderTop(){
+  const el=$('#top'),ws=view,we=addDays(ws,6),isNow=ws===mondayOf(today());
+  const focus=S.focus[ws]||['','',''];
+  let planned=0,cap=0,done=0,total=0;
+  for(let i=0;i<7;i++){const d=dayIso(i);planned+=plannedBlocks(d)+fixedBlocks(i);cap+=S.cap[i];const ts=tasksOn(d);total+=ts.length;done+=ts.filter(t=>t.done).length}
+  const pct=total?Math.round(done/total*100):0,ring=cap?Math.min(1,planned/cap):0,C=2*Math.PI*36;
+  el.innerHTML=`
+   <div class="wk"><small>Week ${isoWeek(ws)}${isNow?' · this week':''}</small>
+     <div class="range">${fmt(ws)} – ${fmt(we)}</div>
+     <div class="nav"><button class="btn small" data-n="-1">‹</button><button class="btn small ${isNow?'on':''}" data-n="0">Today</button><button class="btn small" data-n="1">›</button></div></div>
+   <div class="focus">${[0,1,2].map(i=>`<div><label>Focus ${i+1}</label><input data-f="${i}" maxlength="70" placeholder="${['What matters most?','Second priority','Something for me'][i]}" value="${esc(focus[i]||'')}"></div>`).join('')}</div>
+   <div class="wsum"><div class="worb"><svg viewBox="0 0 78 78"><circle cx="39" cy="39" r="36" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="2.5"/>
+      <circle cx="39" cy="39" r="36" fill="none" stroke="${planned>cap?'#ff6b5e':ACC()}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-ring)}"/></svg>
+      <div class="in"><div class="fill" style="height:${pct}%"></div></div><div class="num">${pct}%</div></div>
+     <div class="txt"><b>${done}/${total}</b> tasks done<br><b>${planned}</b> of ${cap} blocks planned</div></div>`;
+  el.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{const n=+b.dataset.n;view=n===0?mondayOf(today()):addDays(view,7*n);render()});
+  el.querySelectorAll('[data-f]').forEach(inp=>inp.oninput=()=>{const f=(S.focus[ws]||['','','']).slice();f[+inp.dataset.f]=inp.value;S.focus[ws]=f;save()});
+}
+
+function renderBacklog(){
+  const el=$('#backlog'),items=S.tasks.filter(t=>!t.day&&!t.done).sort((a,b)=>(a.due||'9')<(b.due||'9')?-1:(a.due||'9')>(b.due||'9')?1:0);
+  const doneN=S.tasks.filter(t=>!t.day&&t.done).length;
+  el.innerHTML=`<div class="bh"><h3>Backlog</h3><span>${items.length} waiting${doneN?` · ${doneN} done`:''}</span></div>
+    <div class="addrow"><input id="bnew" maxlength="120" placeholder="Add a task…"></div>
+    <div class="acts"><button class="btn small" id="pull">Pull from Orbit</button><button class="btn small" id="auto" title="Spread the backlog over the week's free blocks">Auto-arrange</button></div>
+    <div id="blist" class="dl" data-day=""></div>`;
+  const list=$('#blist');
+  items.forEach(t=>list.appendChild(taskEl(t)));
+  if(!items.length)list.innerHTML='<div class="empty">Nothing waiting. Add tasks here, then drag them onto a day — or press Plan my week.</div>';
+  wireZone(list);
+  const add=()=>{const v=$('#bnew').value.trim();if(!v)return;addTask(v,null)};
+  $('#bnew').onkeydown=e=>{if(e.key==='Enter')add()};
+  $('#pull').onclick=()=>openImport();
+  $('#auto').onclick=()=>{const r=autoArrange();toast(r.msg);render()};
+}
+
+function renderDays(){
+  const el=$('#days');el.innerHTML='';
+  const T=today();
+  for(let i=0;i<7;i++){
+    const d=dayIso(i),ts=tasksOn(d),fx=S.fixed.filter(f=>f.dow===i+1),evs=eventsOn(d);
+    const fb=fixedBlocks(i),pb=plannedBlocks(d),cap=S.cap[i],used=fb+pb,over=used>cap;
+    const done=ts.filter(t=>t.done).length,pct=ts.length?Math.round(done/ts.length*100):0;
+    const ring=cap?Math.min(1,used/cap):0,C=2*Math.PI*21,rc=over?'#ff6b5e':ring>.85?'#ffb703':ACC();
+    const day=document.createElement('div');
+    day.className='day panel'+(d===T?' today':'')+(d<T?' past':'')+(over?' over':'');
+    day.innerHTML=`<div class="dh"><div class="dorb"><svg viewBox="0 0 46 46"><circle cx="23" cy="23" r="21" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="2"/>
+        <circle cx="23" cy="23" r="21" fill="none" stroke="${rc}" stroke-width="2" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-ring)}"/></svg>
+        <div class="in"><div class="fill" style="height:${pct}%"></div></div></div>
+      <div><div class="dd" ${i===6?'title="Buffer day — keep it light"':''}>${DN[i]}</div><div class="dn">${parse(d).getDate()}</div></div>
+      <div class="dc ${over?'warn':''}"><b>${used}/${cap}</b><br>${over?'over by '+(used-cap):(cap-used)+(i===6?' buffer':' free')}</div></div>`;
+    fx.forEach(f=>{const x=document.createElement('div');x.className='fx';x.innerHTML=`▒ <b>${esc(f.label)}</b> · ${f.blocks}`;day.appendChild(x)});
+    evs.forEach(e=>{const x=document.createElement('div');x.className='fx ev';const tm=e.start?(e.start+(e.end?'–'+e.end:'')):'all day';x.innerHTML=`◈ <b>${esc(e.label)}</b><span class="tm">${tm}${evBlocks(e)?' · '+evBlocks(e)+' blk':''}</span>`;x.onclick=()=>openEvent(e);day.appendChild(x)});
+    const list=document.createElement('div');list.className='dl';list.dataset.day=d;
+    ts.forEach(t=>list.appendChild(taskEl(t)));
+    if(!ts.length&&!fx.length&&!evs.length)list.innerHTML='<div class="empty">Free day ✦</div>';
+    wireZone(list,day);
+    day.appendChild(list);
+    const add=document.createElement('div');add.className='dadd';add.innerHTML='<input maxlength="120" placeholder="+ task"><button class="evb" title="Add an event on this day">◈</button>';add.querySelector('.evb').onclick=()=>openEvent(null,d);
+    add.firstChild.onkeydown=e=>{if(e.key==='Enter'&&e.target.value.trim())addTask(e.target.value.trim(),d)};
+    day.appendChild(add);
+    el.appendChild(day);
+  }
+}
+
+function taskEl(t){
+  const T=today(),el=document.createElement('div');
+  const late=!t.done&&t.due&&t.due<T,soon=!t.done&&t.due===T;
+  el.className='tk'+(t.done?' done':'')+(late?' late':'')+(t.time?' timed':'');el.draggable=true;el.dataset.id=t.id;
+  el.innerHTML=`<div class="tr"><input type="checkbox" class="t-chk"><textarea class="t-text" rows="1" maxlength="120"></textarea></div>
+    <div class="meta"><button class="bl" title="50-minute focus blocks — click to change"></button><span class="pills"></span><button class="mn" title="Details">⋯</button></div>
+    <div class="tm"><label>Day</label><input type="date" class="dy"><label>Due</label><input type="date" class="du"><label>Time</label><input type="time" class="ti"><button class="bk">To backlog</button>${t.src?'':'<button class="po">Put in Orbit</button>'}<button class="rm">Delete</button></div>`;
+  const [cb,tx]=el.querySelector('.tr').children,bl=el.querySelector('.bl'),mn=el.querySelector('.mn'),pills=el.querySelector('.pills');
+  cb.checked=!!t.done;tx.value=t.text;
+  const grow=()=>{tx.style.height='auto';tx.style.height=tx.scrollHeight+'px'};requestAnimationFrame(grow);
+  tx.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();tx.blur()}};
+  const dots=()=>bl.textContent='●'.repeat(t.blocks||1);dots();
+  if(t.time)pills.insertAdjacentHTML('beforeend',`<span class="pill tmp">◈ ${t.time}</span>`);
+  if(t.due)pills.insertAdjacentHTML('beforeend',`<span class="pill ${late?'late':soon?'soon':''}">due ${fmt(t.due)}</span>`);
+  if(t.src){pills.insertAdjacentHTML('beforeend','<a class="pill orb go" href="#">from Orbit ↗</a>');const a=pills.querySelector('.go');
+    a.onclick=ev=>{ev.preventDefault();ev.stopPropagation();const l=orbitLink(t.src);if(l)location.href=l.href;else toast('Could not find it in your Orbit')};
+    const l0=orbitLink(t.src);a.title=l0?'Open in your Orbit: '+l0.where:'Open in your Orbit'}
+  cb.onchange=()=>{t.done=cb.checked;orbitPatch(t.src,{done:t.done});save();render()};
+  tx.oninput=()=>{t.text=tx.value;clearTimeout(tx._p);tx._p=setTimeout(()=>orbitPatch(t.src,{text:t.text}),400);save();grow()};
+  bl.onclick=()=>{t.blocks=(t.blocks||1)%4+1;save();render()};
+  mn.onclick=()=>el.classList.toggle('menu');
+  const dy=el.querySelector('.dy'),du=el.querySelector('.du');dy.value=t.day||'';du.value=t.due||'';
+  dy.onchange=()=>{t.day=dy.value||null;if(t.day)view=mondayOf(t.day);save();render()};
+  const ti=el.querySelector('.ti');ti.value=t.time||'';ti.onchange=()=>{t.time=ti.value;orbitPatch(t.src,{time:t.time});save();render()};
+  du.onchange=()=>{t.due=du.value;t.dueAuto=0;orbitPatch(t.src,{due:t.due});save();render()};
+  el.querySelector('.bk').onclick=()=>{t.day=null;save();render()};
+  const po=el.querySelector('.po');if(po)po.onclick=()=>askPlace(t.text,(pid,v)=>{if(!pid)return;const id=orbitAddTodo(pid,v||t.text,t.due,t.done,t.time);if(id){t.src='orbit:'+id;t.text=v||t.text;save();render();toast('Now in your Orbit')}});
+  el.querySelector('.rm').onclick=()=>{S.tasks=S.tasks.filter(x=>x!==t);save();render()};
+  el.addEventListener('dragstart',e=>{dragId=t.id;e.dataTransfer.setData('text/plain',t.id);e.dataTransfer.effectAllowed='move';setTimeout(()=>el.classList.add('drag'),0)});
+  el.addEventListener('dragend',()=>{dragId=null;el.classList.remove('drag');document.querySelectorAll('.slot').forEach(s=>s.remove());document.querySelectorAll('.dropping').forEach(s=>s.classList.remove('dropping'))});
+  return el;
+}
+
+/* ============ drag & drop ============ */
+let dragId=null;
+function beforeIdAt(list,y){
+  const kids=[...list.querySelectorAll('.tk:not(.drag)')];
+  for(const k of kids){const r=k.getBoundingClientRect();if(y<r.top+r.height/2)return k.dataset.id}
+  return null;
+}
+function wireZone(list,card){
+  const hi=card||list;
+  list.addEventListener('dragover',e=>{
+    if(!dragId)return;e.preventDefault();hi.classList.add('dropping');
+    list.querySelectorAll('.slot').forEach(s=>s.remove());
+    const b=beforeIdAt(list,e.clientY),slot=document.createElement('div');slot.className='slot';
+    const ref=b&&list.querySelector(`.tk[data-id="${b}"]`);ref?list.insertBefore(slot,ref):list.appendChild(slot);
+  });
+  list.addEventListener('dragleave',e=>{if(!list.contains(e.relatedTarget)){hi.classList.remove('dropping');list.querySelectorAll('.slot').forEach(s=>s.remove())}});
+  list.addEventListener('drop',e=>{
+    e.preventDefault();if(!dragId)return;
+    const id=dragId,b=beforeIdAt(list,e.clientY),t=S.tasks.find(x=>x.id===id);if(!t)return;
+    S.tasks=S.tasks.filter(x=>x!==t);t.day=list.dataset.day||null;
+    const bi=b?S.tasks.findIndex(x=>x.id===b):-1;bi>=0?S.tasks.splice(bi,0,t):S.tasks.push(t);
+    save();render();
+  });
+}
+
+/* ============ auto-arrange (priority rules from the planning workflow) ============ */
+function autoArrange(){
+  const T=today(),cur=mondayOf(T);
+  if(view<cur)return{msg:'That week is in the past — nothing to arrange.',placed:0};
+  const start=view===cur?(parse(T).getDay()+6)%7:0,days=[...Array(7)].map((_,i)=>dayIso(i)),end=days[6];
+  const back=S.tasks.filter(t=>!t.day&&!t.done);
+  const pri=t=>t.due&&t.due<T?0:t.due&&t.due<=end?1:t.due?3:2;
+  back.sort((a,b)=>pri(a)-pri(b)||((a.due||'9')<(b.due||'9')?-1:(a.due||'9')>(b.due||'9')?1:0));
+  let placed=0;
+  const best=(idx,need,allowOver)=>{
+    let pick=-1,bf=-1e9;
+    idx.forEach(i=>{const f=freeOn(i,days[i]);if(f>=need&&f>bf){bf=f;pick=i}});
+    if(pick<0&&allowOver){idx.forEach(i=>{const f=freeOn(i,days[i]);if(f>bf){bf=f;pick=i}})}
+    return pick;
+  };
+  for(const t of back){
+    const p=pri(t),need=t.blocks||1;let i=-1;
+    if(p===0){for(let k=start;k<7;k++){if(freeOn(k,days[k])>=need){i=k;break}}if(i<0)i=best(range(start,6),need,true)}
+    else if(p===1){const di=Math.max(start,days.indexOf(t.due));i=best(range(start,di),need,true)}
+    else if(p===2){i=best(range(start,5),need,false)}
+    if(i>=0){t.day=days[i];placed++}
+  }
+  const left=S.tasks.filter(t=>!t.day&&!t.done).length;
+  save();
+  return{placed,left,msg:placed?`Placed ${placed} task${placed>1?'s':''}${left?` · ${left} stay in the backlog`:''}`:'Nothing fit — free blocks are used up or tasks are due later.'};
+}
+const range=(a,b)=>{const o=[];for(let i=a;i<=b;i++)o.push(i);return o};
+
+/* ============ Orbit import ============ */
+function collect(n,anc,out,seen){
+  const me=n.id==='root'?anc:[...anc,n.name],where=me.join(' › ');
+  (n.todos||[]).forEach(t=>{if(!t.done&&!seen.has(t.id)){seen.add(t.id);out.push({sid:t.id,text:t.text,due:t.due||'',time:t.time||'',where})}});
+  if(n.task&&!seen.has(n.id)&&(n.progress||0)<100){seen.add(n.id);out.push({sid:n.id,text:n.name,due:n.due||'',where:anc.join(' › ')})}
+  (n.children||[]).forEach(c=>collect(c,me,out,seen));
+}
+/* ============ Orbit sync (planner tasks live in a bubble) ============ */
+const OKEYS=['orbit-v1'];
+function orbitRead(){for(const k of OKEYS){try{const s=JSON.parse(localStorage.getItem(k));if(s&&s.root)return{k,s}}catch(e){}}return null}
+function orbitIndex(root){const m=new Map();(function w(n){(n.todos||[]).forEach(t=>m.set(t.id,{t,n,kind:'todo'}));if(n.task)m.set(n.id,{n,kind:'star'});(n.children||[]).forEach(w)})(root);return m}
+function orbitPlaces(root){const out=[];(function w(n,anc){if(n.ref||n._bl||n.task)return;const me=n.id==='root'?anc:[...anc,n.name];out.push({id:n.id,path:n.id==='root'?n.name+' (general)':me.join(' › ')});(n.children||[]).forEach(c=>w(c,me))})(root,[]);return out}
+async function orbitFile(k,s){try{
+  const db=await new Promise((res,rej)=>{const r=indexedDB.open('bubbles-fs',1);r.onupgradeneeded=()=>r.result.createObjectStore('h');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+  const h=await new Promise(r=>{const q=db.transaction('h').objectStore('h').get('file-'+k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)});
+  if(!h||(await h.queryPermission({mode:'readwrite'}))!=='granted')return;
+  const w=await h.createWritable();await w.write(JSON.stringify(s,null,2));await w.close()}catch(e){}}
+function orbitCommit(o){o.s._mod=Date.now();try{localStorage.setItem(o.k,JSON.stringify(o.s))}catch(e){return}orbitFile(o.k,o.s)}
+function orbitAddTodo(pid,text,due,done,time){const o=orbitRead();if(!o)return null;
+  let node=null;(function w(n){if(n.id===pid)node=n;(n.children||[]).forEach(w)})(o.s.root);if(!node)return null;
+  const id='p'+uid();(node.todos=node.todos||[]).push({id,text,done:!!done,due:due||'',time:time||''});orbitCommit(o);return id}
+function orbitPatch(src,patch){if(!src||!src.startsWith('orbit:'))return;const o=orbitRead();if(!o)return;
+  const hit=orbitIndex(o.s.root).get(src.slice(6));if(!hit)return;
+  if(hit.kind==='todo'){Object.assign(hit.t,patch)}
+  else{if('done' in patch)hit.n.progress=patch.done?100:(hit.n.progress>=100?0:hit.n.progress);if('text' in patch)hit.n.name=patch.text;if('due' in patch)hit.n.due=patch.due}
+  orbitCommit(o)}
+function orbitLink(src){if(!src||!src.startsWith('orbit:'))return null;const o=orbitRead();if(!o)return null;
+  const h=orbitIndex(o.s.root).get(src.slice(6));if(!h)return null;
+  let ids=null,names=[];(function w(n,p,nm){if(ids)return;const q=n.id==='root'?p:[...p,n.id],qn=n.id==='root'?nm:[...nm,n.name];if(n===h.n){ids=h.kind==='star'?p:q;names=h.kind==='star'?nm:qn;return}(n.children||[]).forEach(c=>w(c,q,qn))})(o.s.root,[],[]);
+  if(!ids)return null;return{href:'index.html?from=week#/'+ids.join('/'),where:names.join(' › ')||'Home'}}
+function syncDue(){S.tasks.forEach(t=>{
+  if(t.day){if(!t.due||t.dueAuto){if(t.due!==t.day){t.due=t.day;t.dueAuto=1}}}
+  else if(t.dueAuto){t.due='';t.dueAuto=0;t.dueClear=1}})}
+function pushPlans(){syncDue();const o=orbitRead();if(!o)return;const idx=orbitIndex(o.s.root);let ch=false;
+  S.tasks.forEach(t=>{if(!t.src||!t.src.startsWith('orbit:'))return;const h=idx.get(t.src.slice(6));if(!h||h.kind!=='todo')return;
+    const want=t.day||'';if((h.t.plan||'')!==want){if(want)h.t.plan=want;else delete h.t.plan;ch=true}
+    if(t.dueAuto&&(h.t.due||'')!==t.due){h.t.due=t.due;ch=true}
+    if(t.dueClear){if(h.t.due){h.t.due='';ch=true}delete t.dueClear}});
+  if(ch)orbitCommit(o)}
+function syncFromOrbit(){const o=orbitRead();if(!o)return false;const idx=orbitIndex(o.s.root);let ch=false;
+  S.tasks.forEach(t=>{if(!t.src||!t.src.startsWith('orbit:'))return;const h=idx.get(t.src.slice(6));if(!h)return;
+    const v=h.kind==='todo'?{text:h.t.text,due:h.t.due||'',time:h.t.time||'',done:!!h.t.done}:{text:h.n.name,due:h.n.due||'',time:t.time||'',done:(h.n.progress||0)>=100};
+    if(t.text!==v.text||(t.due||'')!==v.due||(t.time||'')!==v.time||!!t.done!==v.done){if(v.due&&v.due!==t.day)t.dueAuto=0;Object.assign(t,v);ch=true}});
+  return ch}
+function askPlace(text,cb){
+  const o=orbitRead();if(!o){cb(null);return}
+  const pl=orbitPlaces(o.s.root);let last='';try{last=localStorage.getItem('week-lastplace')||''}catch(e){}
+  const m=modal(`<h2>Where does it live?</h2><p class="sub">Every task belongs to a place in your Orbit, so both stay in sync.</p>
+    <div class="fld"><label>Task</label><input class="tx" id="pt" maxlength="120" value="${esc(text)}"></div>
+    <div class="evrow"><div class="fld"><label>Time (optional)</label><input class="tm2" type="time" id="pti"></div></div>
+    <div class="fld"><label>Orbit place</label><input class="tx" id="pf2" placeholder="Type to filter…"><select id="ps" size="7" class="pls"></select></div>
+    <div class="row"><button class="btn ghost" id="x">Cancel</button><button class="btn primary" id="ok">Add</button></div>`);
+  const sel=$('#ps',m),f=$('#pf2',m),pt=$('#pt',m);
+  const fill=()=>{const q=f.value.toLowerCase(),keep=sel.value||last;sel.innerHTML=pl.filter(x=>x.path.toLowerCase().includes(q)).map(x=>`<option value="${x.id}" ${x.id===keep?'selected':''}>${esc(x.path)}</option>`).join('');if(!sel.value&&sel.options.length)sel.selectedIndex=0};
+  fill();f.oninput=()=>{sel.value='';fill()};
+  const go=()=>{const v=pt.value.trim();if(!sel.value||!v)return;try{localStorage.setItem('week-lastplace',sel.value)}catch(e){}m.close();cb(sel.value,v,$('#pti',m).value)};
+  $('#x',m).onclick=m.close;$('#ok',m).onclick=go;sel.ondblclick=go;
+  m.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();go()}});
+  setTimeout(()=>{sel.scrollTop=(sel.selectedIndex>=0?sel.selectedIndex:0)*18-40;f.focus()},0)}
+function addTask(text,day,after){
+  askPlace(text,(pid,v,tm)=>{const txt=v||text,id=pid?orbitAddTodo(pid,txt,'',false,tm):null;
+    S.tasks.push({id:uid(),text:txt,blocks:1,done:false,day:day||null,due:'',time:tm||'',src:id?'orbit:'+id:''});
+    save();render();if(!pid)toast('No Orbit data visible — kept only in the planner');if(after)after()})}
+
+function orbitItems(){
+  const out=[],seen=new Set();
+  for(const k of OKEYS){let s;try{s=JSON.parse(localStorage.getItem(k))}catch(e){}if(s&&s.root)collect(s.root,[],out,seen)}
+  (S.snap||[]).forEach(x=>{if(!seen.has(x.sid)){seen.add(x.sid);out.push(x)}});
+  const have=new Set(S.tasks.map(t=>t.src));
+  return out.filter(x=>!have.has('orbit:'+x.sid)).sort((a,b)=>(a.due||'9')<(b.due||'9')?-1:(a.due||'9')>(b.due||'9')?1:0);
+}
+function importFile(file,after){
+  const fr=new FileReader();
+  fr.onload=()=>{try{const s=JSON.parse(fr.result);if(!s.root)throw 0;const out=[];collect(s.root,[],out,new Set());S.snap=out;save();toast('Read '+out.length+' open items from Orbit');after&&after()}catch(e){toast('That is not an Orbit data file')}};
+  fr.readAsText(file);
+}
+
+/* ============ modals ============ */
+function modal(html){
+  const o=document.createElement('div');o.className='ov';o.innerHTML='<div class="card">'+html+'</div>';
+  document.body.appendChild(o);
+  const close=()=>{o.remove();document.removeEventListener('keydown',esc2)};
+  const esc2=e=>{if(e.key==='Escape')close()};document.addEventListener('keydown',esc2);
+  o.addEventListener('pointerdown',e=>{if(e.target===o)close()});
+  o.close=close;return o;
+}
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2600)}
+
+const allBar=id=>`<div class="allbar"><button class="btn small" data-all="${id}">Select all</button></div>`;
+function wireAll(root){root.querySelectorAll('[data-all]').forEach(b=>{const box=root.querySelector(b.dataset.all);if(!box)return;
+ const cs=()=>[...box.querySelectorAll('input[type=checkbox]')];
+ const sync=()=>{b.textContent=cs().every(c=>c.checked)?'Select none':'Select all'};
+ b.onclick=()=>{const v=!cs().every(c=>c.checked);cs().forEach(c=>{if(c.checked!==v){c.checked=v;c.dispatchEvent(new Event('change'))}});sync()};
+ box.addEventListener('change',sync);sync()})}
+function pickList(items,checked){
+  return items.map((x,i)=>`<label class="pick"><input type="checkbox" data-i="${i}" ${checked(x)?'checked':''}><span>${esc(x.text)}</span><span class="w">${x.due?'due '+fmt(x.due)+'<br>':''}${esc(x.where||'')}</span></label>`).join('');
+}
+
+function openImport(){
+  const items=orbitItems(),we=addDays(view,6);
+  const o=modal(`<h2>Pull from Orbit</h2><p class="sub">Open to-dos and task stars from your Orbit bubbles. Ticked ones are due this week or overdue.</p>
+    ${items.length?`${allBar('#pk')}<div class="picks" id="pk">${pickList(items,x=>x.due&&x.due<=we)}</div>`:`<p class="sub">No Orbit data visible from this page. Browsers can keep local pages separate — choose your Orbit data file (the JSON you saved or linked in Orbit) once:</p><button class="btn" id="pf">Choose Orbit data file…</button><input type="file" id="pfi" accept=".json" hidden>`}
+    <div class="row"><button class="btn ghost" id="x">Close</button>${items.length?'<button class="btn primary" id="go">Add to backlog</button>':''}</div>`);
+  $('#x',o).onclick=o.close;wireAll(o);
+  if(!items.length){const pf=$('#pf',o),pfi=$('#pfi',o);pf.onclick=()=>pfi.click();pfi.onchange=e=>{if(e.target.files[0])importFile(e.target.files[0],()=>{o.close();openImport()})}}
+  else $('#go',o).onclick=()=>{
+    const sel=[...o.querySelectorAll('input[data-i]:checked')].map(c=>items[+c.dataset.i]);
+    sel.forEach(x=>S.tasks.push({id:uid(),text:x.text,blocks:1,done:false,day:null,due:x.due,time:x.time||'',src:'orbit:'+x.sid}));
+    save();o.close();render();toast(sel.length?`Added ${sel.length} to the backlog`:'Nothing selected');
+  };
+}
+
+function openPlan(){
+  const ws=view,we=addDays(ws,6);let step=1;
+  const focus=(S.focus[ws]||['','','']).slice();
+  const items=orbitItems();
+  const week=new Set(S.tasks.filter(t=>t.day&&t.day>=ws&&t.day<=we).map(t=>t.text));
+  const routines=S.routines.filter(r=>!week.has(r.text));
+  let selOrb=new Set(items.map((x,i)=>x.due&&x.due<=we?i:-1).filter(i=>i>=0)),selRt=new Set(routines.map((_,i)=>i)),auto=true;
+  const o=modal('');const card=o.firstChild;
+  function draw(){
+    const caps=range(0,6).map(i=>`<div>${DN[i]}<br><b>${S.cap[i]-fixedBlocks(i)}</b></div>`).join('');
+    if(step===1){
+      card.innerHTML=`<div class="steps"><i class="on"></i><i></i></div><h2>Plan the week</h2><p class="sub">${fmt(ws)} – ${fmt(we)} · week ${isoWeek(ws)}. First, what would make this week a good one?</p>
+        ${[0,1,2].map(i=>`<div class="fld"><label>Focus ${i+1}</label><input class="tx" data-f="${i}" maxlength="70" value="${esc(focus[i]||'')}" placeholder="${['What matters most?','Second priority','Something for me'][i]}"></div>`).join('')}
+        <div class="sec">Free focus blocks per day (after fixed commitments)</div><div class="cap">${caps}</div>
+        <div class="row"><button class="btn ghost" id="x">Cancel</button><button class="btn primary" id="nx">Next →</button></div>`;
+      card.querySelectorAll('[data-f]').forEach(inp=>inp.oninput=()=>focus[+inp.dataset.f]=inp.value);
+      $('#nx',card).onclick=()=>{step=2;draw()};
+    }else{
+      card.innerHTML=`<div class="steps"><i class="on"></i><i class="on"></i></div><h2>Bring in tasks</h2><p class="sub">Pick what belongs in this week.</p>
+        <div class="sec">From Orbit</div>${items.length?`${allBar('#po')}<div class="picks" id="po">${pickList(items,(x,i)=>selOrb.has(items.indexOf(x)))}</div>`:'<div class="empty">Nothing new from Orbit (use “Pull from Orbit” in the backlog if you need to load your data file).</div>'}
+        <div class="sec">Weekly routines</div>${routines.length?`${allBar('#pr')}<div class="picks" id="pr">${routines.map((r,i)=>`<label class="pick"><input type="checkbox" data-i="${i}" ${selRt.has(i)?'checked':''}><span>${esc(r.text)}</span><span class="w">${r.dow?DN[r.dow-1]:'any day'}</span></label>`).join('')}</div>`:'<div class="empty">Routines are already in this week.</div>'}
+        <label class="pick"><input type="checkbox" id="au" ${auto?'checked':''}><span>Auto-arrange into free blocks (overdue and due-soon first, Sunday stays a buffer)</span></label>
+        <div class="row"><button class="btn ghost" id="bk">← Back</button><button class="btn primary" id="go">Plan it ✦</button></div>`;
+      card.querySelectorAll('#po input').forEach(c=>c.onchange=()=>c.checked?selOrb.add(+c.dataset.i):selOrb.delete(+c.dataset.i));
+      card.querySelectorAll('#pr input').forEach(c=>c.onchange=()=>c.checked?selRt.add(+c.dataset.i):selRt.delete(+c.dataset.i));
+      wireAll(card);
+      $('#au',card).onchange=e=>auto=e.target.checked;
+      $('#bk',card).onclick=()=>{step=1;draw()};
+      $('#go',card).onclick=()=>{
+        S.focus[ws]=focus;
+        [...selOrb].forEach(i=>{const x=items[i];S.tasks.push({id:uid(),text:x.text,blocks:1,done:false,day:null,due:x.due,time:x.time||'',src:'orbit:'+x.sid})});
+        [...selRt].forEach(i=>{const r=routines[i];S.tasks.push({id:uid(),text:r.text,blocks:r.blocks||1,done:false,day:r.dow?addDays(ws,r.dow-1):null,due:'',src:''})});
+        const r=auto?autoArrange():{msg:'Added to your week'};
+        save();o.close();render();toast(r.msg);
+      };
+    }
+    const x=$('#x',card);if(x)x.onclick=o.close;
+  }
+  draw();
+}
+
+function openEvent(ev,date){
+  const e=ev||{id:uid(),date:date||today(),label:'',start:'',end:''};
+  const o=modal(`<h2>${ev?'Edit event':'New event'}</h2><p class="sub">A one-off event. If it has a start and end time, it blocks focus blocks on that day (about one per hour).</p>
+    <div class="fld"><label>Event</label><input class="tx" id="el" maxlength="80" value="${esc(e.label)}" placeholder="Meeting, dentist, trip…"></div>
+    <div class="evrow"><div class="fld"><label>Date</label><input class="tm2" type="date" id="ed" value="${e.date}"></div>
+    <div class="fld"><label>From</label><input class="tm2" type="time" id="es" value="${e.start||''}"></div>
+    <div class="fld"><label>To</label><input class="tm2" type="time" id="ee" value="${e.end||''}"></div></div>
+    <div class="row">${ev?'<button class="btn ghost" id="edel">Delete</button>':''}<button class="btn ghost" id="x">Cancel</button><button class="btn primary" id="ok">${ev?'Save':'Add event'}</button></div>`);
+  $('#x',o).onclick=o.close;
+  const lab=$('#el',o);lab.focus();
+  const del=$('#edel',o);if(del)del.onclick=()=>{S.events=S.events.filter(x=>x.id!==e.id);save();o.close();render()};
+  const go=()=>{const l=lab.value.trim();if(!l){lab.focus();return}
+    e.label=l;e.date=$('#ed',o).value||e.date;e.start=$('#es',o).value;e.end=$('#ee',o).value;
+    if(!ev)S.events.push(e);
+    save();o.close();view=mondayOf(e.date);render();toast('Event saved')};
+  $('#ok',o).onclick=go;o.addEventListener('keydown',k=>{if(k.key==='Enter')go()});
+}
+
+function openSetup(){
+  const dowOpts=(v,any)=>(any?`<option value="0">any day</option>`:'')+DN.map((d,i)=>`<option value="${i+1}" ${v===i+1?'selected':''}>${d}</option>`).join('');
+  const o=modal('');const card=o.firstChild;
+  function draw(){
+    card.innerHTML=`<h2>Setup</h2><p class="sub">One block = 50 minutes of focus + 10 minutes break. Set how many blocks you can realistically do each day.</p>
+      <div class="sec">Focus blocks per day</div><div class="cap">${range(0,6).map(i=>`<div>${DN[i]}<input type="number" min="0" max="12" data-c="${i}" value="${S.cap[i]}"></div>`).join('')}</div>
+      <div class="sec">Fixed commitments (repeat every week)</div>
+      ${S.fixed.map(f=>`<div class="rowf" data-f="${f.id}"><select class="d">${dowOpts(f.dow)}</select><input class="l" value="${esc(f.label)}" placeholder="Lecture, class…"><input class="n" type="number" min="1" max="12" value="${f.blocks}" title="blocks blocked"><button class="btn small">×</button></div>`).join('')}
+      <button class="btn small" id="af">+ Add commitment</button>
+      <div class="sec">Weekly routines (offered every time you plan)</div>
+      ${S.routines.map(r=>`<div class="rowf" data-r="${r.id}"><select class="d">${dowOpts(r.dow,true)}</select><input class="l" value="${esc(r.text)}" placeholder="Task"><input class="n" type="number" min="1" max="6" value="${r.blocks}"><button class="btn small">×</button></div>`).join('')}
+      <button class="btn small" id="ar">+ Add routine</button>
+      <div class="row"><button class="btn primary" id="done">Done</button></div>`;
+    card.querySelectorAll('[data-c]').forEach(i=>i.oninput=()=>{S.cap[+i.dataset.c]=Math.max(0,+i.value||0);save()});
+    card.querySelectorAll('[data-f]').forEach(r=>{const f=S.fixed.find(x=>x.id===r.dataset.f);r.querySelector('.d').onchange=e=>{f.dow=+e.target.value;save()};r.querySelector('.l').oninput=e=>{f.label=e.target.value;save()};r.querySelector('.n').oninput=e=>{f.blocks=+e.target.value||1;save()};r.querySelector('button').onclick=()=>{S.fixed=S.fixed.filter(x=>x!==f);save();draw()}});
+    card.querySelectorAll('[data-r]').forEach(r=>{const f=S.routines.find(x=>x.id===r.dataset.r);r.querySelector('.d').onchange=e=>{f.dow=+e.target.value;save()};r.querySelector('.l').oninput=e=>{f.text=e.target.value;save()};r.querySelector('.n').oninput=e=>{f.blocks=+e.target.value||1;save()};r.querySelector('button').onclick=()=>{S.routines=S.routines.filter(x=>x!==f);save();draw()}});
+    $('#af',card).onclick=()=>{S.fixed.push({id:uid(),dow:1,label:'',blocks:2});save();draw()};
+    $('#ar',card).onclick=()=>{S.routines.push({id:uid(),text:'',blocks:1,dow:0});save();draw()};
+    $('#done',card).onclick=()=>{o.close();render()};
+  }
+  draw();
+}
+
+/* ============ top buttons ============ */
+$('#plan').onclick=openPlan;
+$('#evbtn').onclick=()=>openEvent(null,today());
+$('#setup').onclick=openSetup;
+$('#exp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,2)],{type:'application/json'}));a.download='week-backup.json';a.click();toast('Backup downloaded')};
+$('#imp').onclick=()=>$('#file').click();
+$('#file').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;const fr=new FileReader();
+  fr.onload=()=>{try{const s=JSON.parse(fr.result);if(!Array.isArray(s.tasks))throw 0;S=Object.assign(defaults(),s);save();render();toast('Backup loaded')}catch(_){toast('That file is not a week backup')}};
+  fr.readAsText(f);e.target.value='';
+};
+$('#back').onclick=e=>{e.preventDefault();document.body.classList.add('warp-out');const h=e.currentTarget.href;setTimeout(()=>location.href=h,520)};
+
+/* ============ link file (autosave, Chrome/Edge) ============ */
+var fh=null,fT=0;
+(function(){
+  const btn=$('#lf');if(!window.showSaveFilePicker){btn.style.display='none';return}
+  const FK='file-'+KEY;
+  const idb=()=>new Promise((res,rej)=>{const r=indexedDB.open('week-fs',1);r.onupgradeneeded=()=>r.result.createObjectStore('h');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+  const idbSet=async v=>{try{const d=await idb();const t=d.transaction('h','readwrite');v?t.objectStore('h').put(v,FK):t.objectStore('h').delete(FK)}catch(e){}};
+  const idbGet=async()=>{try{const d=await idb();return await new Promise(r=>{const q=d.transaction('h').objectStore('h').get(FK);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)})}catch(e){return null}};
+  function paint(m){btn.classList.toggle('on',m==='on');btn.textContent=m==='on'?'● '+(fh&&fh.name||'file'):m==='ask'?'Reconnect file':'Link file';btn.title=m==='on'?'Autosaving to this file · click to stop':'Autosave to a file on your computer'}
+  window.fileSync=function(){if(!fh)return;clearTimeout(fT);fT=setTimeout(async()=>{try{const w=await fh.createWritable();await w.write(JSON.stringify(S,null,2));await w.close();paint('on')}catch(e){paint('ask')}},400)};
+  const readFile=async()=>{try{const t=await (await fh.getFile()).text();if(!t.trim())return null;const s=JSON.parse(t);return Array.isArray(s.tasks)?s:null}catch(e){return null}};
+  const apply=s=>{S=fixTA(Object.assign(defaults(),s));applyPal();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}render()};
+  btn.onclick=async()=>{
+    try{
+      if(fh&&btn.classList.contains('on')){if(confirm('Stop autosaving to "'+fh.name+'"? Your plan stays saved in this browser.')){fh=null;idbSet(null);paint('off')}return}
+      if(fh){if(await fh.requestPermission({mode:'readwrite'})==='granted'){const s=await readFile();if(s)apply(s);else window.fileSync();paint('on');toast('Autosave on')}return}
+      const h=await showSaveFilePicker({suggestedName:'week-data.json',types:[{description:'Week data',accept:{'application/json':['.json']}}]});
+      fh=h;const s=await readFile();
+      if(s&&confirm('This file already contains a plan.\n\nOK = load it here\nCancel = replace the file with what is on screen'))apply(s);else window.fileSync();
+      idbSet(h);paint('on');toast('Autosaving to '+h.name);
+    }catch(e){if(e&&e.name!=='AbortError')toast('Could not link that file')}
+  };
+  (async()=>{const h=await idbGet();if(!h){paint('off');return}fh=h;try{if(await h.queryPermission({mode:'readwrite'})==='granted'){const s=await readFile();if(s)apply(s);paint('on')}else paint('ask')}catch(e){paint('ask')}})();
+})();
+
+/* ============ world: stars + arrival ============ */
+(function(){
+  const bg=$('#bg');
+  for(let i=0;i<110;i++){const s=document.createElement('i');s.className='star';const z=Math.random();
+    s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${z>.9?3:z>.6?2:1.4}px;height:${z>.9?3:z>.6?2:1.4}px;animation-duration:${2+Math.random()*5}s;animation-delay:-${Math.random()*6}s`;
+    bg.appendChild(s)}
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{const f=$('#warpfx');f.style.transition='opacity 1s ease-out';f.classList.remove('arrive')}));
+})();
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.activeElement&&/INPUT|SELECT/.test(document.activeElement.tagName))document.activeElement.blur()});
+applyPal();
+(function(){const pop=document.getElementById('palpop'),btn=document.getElementById('palbtn');
+ const dots=c=>`<i>${c.slice(0,6).map(x=>`<b style="background:${x}"></b>`).join('')}</i>`;
+ const draw=()=>{const cur=S.palette||'orbit';pop.innerHTML=`<button data-k="orbit" class="${cur==='orbit'?'on':''}">${dots(PALETTES[palKey()].slice(0,6))}Same as Orbit</button><div class="psep"></div>`+Object.keys(PALETTES).map(k=>`<button data-k="${k}" class="${cur===k?'on':''}">${dots(PALETTES[k])}${k}</button>`).join('')};
+ draw();
+ btn.onclick=e=>{e.stopPropagation();draw();pop.classList.toggle('open')};
+ pop.onclick=e=>{const b=e.target.closest('button');if(!b)return;S.palette=b.dataset.k;applyPal();save();render();draw()};
+ document.addEventListener('click',e=>{if(!pop.contains(e.target))pop.classList.remove('open')});
+})();
+syncFromOrbit();try{pushPlans()}catch(e){}
+const resync=()=>{if(document.hidden)return;applyPal();if(syncFromOrbit()){save();render()}};
+document.addEventListener('visibilitychange',resync);window.addEventListener('focus',resync);window.addEventListener('storage',resync);
+render();
+</script>
+</body>
+</html>
