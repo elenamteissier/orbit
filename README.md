@@ -67,3 +67,9 @@ Plain HTML, CSS and JavaScript — no dependencies, no build step. Orbit lives i
 ## License
 
 MIT — © 2026 Elena Teissier. See [LICENSE](LICENSE).
+
+## Contributors
+
+- Elena Teissier
+- - Claude (Anthropic)
+  - 
