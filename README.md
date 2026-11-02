@@ -4,7 +4,7 @@
 
 Two plain HTML files. No install, no server, no account. Your data stays in your browser.
 
-**Live demo:** https://elenamteissier.github.io/orbit/ · **Weekly planner:** https://elenamteissier.github.io/orbit/weekly-planner.html
+
 
 ![Home view](assets/home.png)
 
