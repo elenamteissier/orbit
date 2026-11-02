@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Orbit</title>
 <meta name="author" content="Elena Teissier">
-<meta name="description" content="Orbit: a space-themed progress tracker. Projects are planets, sub-projects are moons, tasks are stars.">
+<meta name="description" content="Orbit: a space-themed progress tracker. Projects are planets, sub-projects are moons, tasks are stars. Includes a weekly planner.">
 <style>
 :root{
   --s:124px;--sun:168px;
@@ -208,6 +208,7 @@ body.tl #detail{top:188px}
 .tl-c i{width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 6px var(--c);flex:none}
 .tl-c small{opacity:.55;font-size:10px}
 .tl-c.late{border-color:#ff6b5e}.tl-c.late small{color:#ff9a8f;opacity:1}
+.tl-c.planned{border-style:dashed}
 /* tasks as stars */
 .bubble.tstar{--s:60px;cursor:pointer}
 .bubble.tstar .float{display:grid;place-items:center}
@@ -251,14 +252,20 @@ body.tl #detail{top:188px}
 #tlctl button.on{opacity:1;background:rgba(255,255,255,.13)}
 .tl-dt{position:absolute;top:86px;width:1px;height:5px;background:rgba(255,255,255,.22)}
 .tl-dl{position:absolute;top:94px;font-size:10px;opacity:.5;transform:translateX(3px);white-space:nowrap}
+#warpfx{position:fixed;inset:0;z-index:99;pointer-events:none;opacity:0;transition:opacity .55s ease-in;background:radial-gradient(circle at 50% 50%,rgba(45,226,197,.55),rgba(155,92,255,.4) 38%,#05070b 78%)}
+#warpfx.arrive{opacity:1;transition:none;background:radial-gradient(circle at 50% 50%,rgba(255,200,80,.6),rgba(155,92,255,.4) 38%,#05070b 78%)}
+body.warp-out #warpfx{opacity:1}
+body.warp-out #stage,body.warp-out header,body.warp-out #timeline,body.warp-out #tlctl,body.warp-out #detail,body.warp-out #notecard,body.warp-out #hole{transition:transform .55s ease-in,opacity .55s,filter .55s;transform:scale(1.35);opacity:0;filter:blur(12px) brightness(1.6)}
+.btn.world{border-color:rgba(45,226,197,.55);color:#2de2c5;text-decoration:none;display:inline-block}
+.btn.world:hover{background:rgba(45,226,197,.15);box-shadow:0 0 18px rgba(45,226,197,.3)}
 .tabs{display:flex;gap:4px;justify-content:center;margin-top:10px}
 .tab{background:none;border:1px solid transparent;border-radius:6px;padding:4px 12px;font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.55}
 .tab.on{opacity:1;border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.05)}
 .todo{margin-top:8px;text-align:left}
 .t-list{max-height:170px;overflow-y:auto}
-.t-row{display:flex;align-items:center;gap:8px;padding:6px 2px;border-bottom:1px solid rgba(255,255,255,.06)}
+.t-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:6px 2px;border-bottom:1px solid rgba(255,255,255,.06)}
 .t-chk{accent-color:var(--c,var(--dc,#8fb8ff));width:15px;height:15px;flex:none}
-.t-text{flex:1;min-width:0;background:transparent;border:0;outline:0;color:var(--ink);font:inherit;font-size:13px;padding:2px}
+.t-text{flex:1 1 110px;min-width:0;background:transparent;border:0;outline:0;color:var(--ink);font:inherit;font-size:13px;padding:2px}
 .t-date{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:var(--ink);font:inherit;font-size:11px;padding:3px 6px;color-scheme:dark;width:122px;flex:none}
 .t-del{background:none;border:0;opacity:.4;font-size:16px;line-height:1;flex:none}
 .t-del:hover{opacity:1}
@@ -266,7 +273,17 @@ body.tl #detail{top:188px}
 .t-row.late .t-date{border-color:#ff6b5e;color:#ff9a8f}
 .t-row.today .t-date{border-color:#ffb703;color:#ffd166}
 .t-empty{opacity:.4;font-size:12px;padding:8px 2px}
-.t-add{display:flex;gap:6px;margin-top:8px}
+.t-time{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:var(--ink);font:inherit;font-size:11px;padding:3px 6px;color-scheme:dark;width:84px;flex:none}
+.t-row.timed .t-time{border-color:rgba(155,92,255,.7);color:#c8a6ff}
+.wl h3{font-size:20px;letter-spacing:4px;text-transform:uppercase;font-weight:400;margin:0 0 6px}
+.wl p{opacity:.7;font-size:13px;line-height:1.6;margin:0 0 14px}
+.wl ul{list-style:none;padding:0;margin:0 0 18px;display:grid;gap:9px;text-align:left}
+.wl li{font-size:13px;line-height:1.5;padding-left:16px;position:relative;opacity:.9}
+.wl li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--p0);box-shadow:0 0 8px var(--p0)}
+.wl b{font-weight:600}
+.wl .row{justify-content:center}
+.wl-foot{margin-top:16px;font-size:11px;letter-spacing:1px;opacity:.4}
+.t-add{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .t-new{flex:1;min-width:0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:6px;color:var(--ink);font:inherit;font-size:13px;padding:6px 8px;outline:0}
 .t-new:focus{border-color:var(--c,var(--dc,#fff))}
 .t-add button{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:6px;width:30px;flex:none}
@@ -302,14 +319,6 @@ body.tl #detail{top:188px}
 .toast{position:fixed;left:50%;bottom:190px;transform:translateX(-50%);background:rgba(18,22,52,.95);padding:10px 16px;border-radius:99px;
   border:1px solid rgba(255,255,255,.2);z-index:80;animation:fade .3s}
 @media (max-width:600px){:root{--s:96px;--sun:120px}.btn span{display:none}}
-.wl h3{font-size:20px;letter-spacing:4px;text-transform:uppercase;font-weight:400;margin:0 0 6px}
-.wl p{opacity:.7;font-size:13px;line-height:1.6;margin:0 0 14px}
-.wl ul{list-style:none;padding:0;margin:0 0 18px;display:grid;gap:9px;text-align:left}
-.wl li{font-size:13px;line-height:1.5;padding-left:16px;position:relative;opacity:.9}
-.wl li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--p0);box-shadow:0 0 8px var(--p0)}
-.wl b{font-weight:600}
-.wl .row{justify-content:center}
-.wl-foot{margin-top:16px;font-size:11px;letter-spacing:1px;opacity:.4}
 </style>
 </head>
 <body class="tl">
@@ -325,6 +334,7 @@ body.tl #detail{top:188px}
     <div class="pal-menu" id="palMenu"></div>
   </div>
   <button class="btn" id="help" title="What is this?">?</button>
+  <a class="btn world" id="weekBtn" href="weekly-planner.html" title="Enter the weekly planner">Week ↗</a>
   <button class="btn" id="lf">Link file</button>
   <button class="btn" id="exp" title="Download backup">Save</button>
   <button class="btn" id="imp" title="Load backup">Load</button>
@@ -364,7 +374,14 @@ const $=s=>document.querySelector(s);
 const stage=$('#stage'), hole=$('#hole');
 const uid=()=>Math.random().toString(36).slice(2,9);
 
-function safeUrl(u){u=(u||'').trim();if(!u)return '';if(!/^https?:\/\//i.test(u))u='https://'+u;try{const p=new URL(u);return /^https?:$/.test(p.protocol)?p.href:''}catch(e){return ''}}
+const VAULT=()=>{try{return localStorage.getItem('orbit-vault')||'MyVault'}catch(e){return 'MyVault'}};
+const isObs=u=>/^obsidian:\/\//i.test(u||'');
+function safeUrl(u){u=(u||'').trim();if(!u)return '';
+  if(/^obsidian:\/\/[a-z-]+\?/i.test(u))return u;
+  let m=/^\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|[^\]]*)?\]\]$/.exec(u);
+  if(!m)m=/^([^:?*"<>|]+?)(?:\.md)?$/i.exec(/\.md$/i.test(u)&&!/^https?:/i.test(u)?u:'');
+  if(m)return 'obsidian://open?vault='+encodeURIComponent(VAULT())+'&file='+encodeURIComponent(m[1].trim().replace(/\\/g,'/'));
+if(!/^https?:\/\//i.test(u))u='https://'+u;try{const p=new URL(u);return /^https?:$/.test(p.protocol)?p.href:''}catch(e){return ''}}
 
 function todayISO(){return new Date().toLocaleDateString('sv-SE')}
 var IDX=null;
@@ -387,19 +404,20 @@ function todoPane(n,onChange){
   const wrap=document.createElement('div');wrap.className='todo';
   const list=document.createElement('div');list.className='t-list';
   const add=document.createElement('div');add.className='t-add';
-  add.innerHTML='<input class="t-new" placeholder="Add a task…" maxlength="120"><input class="t-date" type="date" title="Due date"><button title="Add task">+</button>';
+  add.innerHTML='<input class="t-new" placeholder="Add a task…" maxlength="120"><input class="t-date" type="date" title="Due date"><input class="t-time" type="time" title="Time (optional) — makes it an event"><button title="Add task">+</button>';
   wrap.append(list,add);
-  const commit=()=>{save();if(onChange)onChange()};
+  const commit=()=>{save();if(onChange)onChange();try{drawTimeline()}catch(e){}};
   function draw(){
     list.innerHTML='';
-    const t=todayISO(),key=x=>x.due||'9999-12-31';
+    const t=todayISO(),key=x=>(x.due||'9999-12-31')+' '+(x.time||'99:99');
     const items=[...n.todos].sort((a,b)=>(a.done-b.done)||(key(a)<key(b)?-1:key(a)>key(b)?1:0));
     items.forEach(it=>{
       const row=document.createElement('div');
-      row.className='t-row'+(it.done?' done':'')+(!it.done&&it.due&&it.due<t?' late':'')+(!it.done&&it.due===t?' today':'');
-      row.innerHTML='<input type="checkbox" class="t-chk"><input class="t-text" maxlength="120"><input type="date" class="t-date"><button class="t-del" title="Remove">×</button>';
-      const [cb,tx,dt,del]=row.children;
-      cb.checked=!!it.done;tx.value=it.text;dt.value=it.due||'';
+      row.className='t-row'+(it.done?' done':'')+(!it.done&&it.due&&it.due<t?' late':'')+(!it.done&&it.due===t?' today':'')+(it.time?' timed':'');
+      row.innerHTML='<input type="checkbox" class="t-chk"><input class="t-text" maxlength="120"><input type="date" class="t-date"><input type="time" class="t-time" title="Time (optional) — makes it an event"><button class="t-del" title="Remove">×</button>';
+      const [cb,tx,dt,tm,del]=row.children;
+      cb.checked=!!it.done;tx.value=it.text;dt.value=it.due||'';tm.value=it.time||'';
+      tm.onchange=()=>{it.time=tm.value;commit();draw()};
       cb.onchange=()=>{it.done=cb.checked;commit();draw()};
       tx.oninput=()=>{it.text=tx.value;save()};
       dt.onchange=()=>{it.due=dt.value;commit();draw()};
@@ -408,14 +426,24 @@ function todoPane(n,onChange){
     });
     if(!items.length){const e=document.createElement('div');e.className='t-empty';e.textContent='No tasks yet';list.appendChild(e)}
   }
-  const [tin,din,btn]=add.children;
-  const addTask=()=>{const v=tin.value.trim();if(!v){tin.focus();return}n.todos.push({id:uid(),text:v,done:false,due:din.value||''});tin.value='';din.value='';commit();draw();tin.focus()};
+  const [tin,din,tmn,btn]=add.children;
+  const addTask=()=>{const v=tin.value.trim();if(!v){tin.focus();return}n.todos.push({id:uid(),text:v,done:false,due:din.value||'',time:tmn.value||''});tin.value='';din.value='';tmn.value='';commit();draw();tin.focus()};
   btn.onclick=addTask;tin.onkeydown=e=>{if(e.key==='Enter')addTask()};
   draw();return wrap;
 }
 
 /* ---------- data ---------- */
 function mk(name,c,p,x,y,kids=[]){return{id:uid(),name,c,progress:p,auto:false,x,y,children:kids}}
+function B(name,c,p=0,kids=[],auto=false,notes='',link=''){return{id:uid(),name,c,progress:p,auto,notes,link,x:.5,y:.5,children:kids}}
+function L(name,c,p,notes,link=''){return B(name,c,p,[],false,notes,link)}
+function lay(list){
+  const k=list.length,rows=k>3?2:1,per=Math.ceil(k/rows);
+  list.forEach((n,i)=>{
+    const r=Math.floor(i/per),cnt=r===0?per:k-per,idx=i-r*per;
+    n.x=(idx+1)/(cnt+1);n.y=rows===1?.52:(r===0?.4:.68);
+  });
+  return list;
+}
 function dayISO(n){const d=new Date();d.setDate(d.getDate()+n);return d.toLocaleDateString('sv-SE')}
 function X(id,name,c,p,kids=[],o={}){return Object.assign({id,name,c,progress:p,auto:false,x:.5,y:.5,children:kids},o)}
 function TT(text,due,done=false){return{id:uid(),text,done,due:due===null?'':dayISO(due)}}
@@ -443,9 +471,11 @@ function exampleSeed(){
 }
 function seed(){return{palette:'Spectrum',root:{id:'root',name:'Home',children:[]}}}
 function fixAuto(n){if(n.children&&n.children.length){if(!n.auto&&!n.progress)n.auto=true;n.children.forEach(fixAuto)}}
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.root){fixAuto(s.root);return s}}catch(e){}return null}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}if(window.fileSync)window.fileSync()}
+function migrate(s){return s}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.root){migrate(s);fixAuto(s.root);return s}}catch(e){}return null}
+function save(){state._mod=Date.now();try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}if(window.fileSync)window.fileSync()}
 let state=load()||exampleSeed();
+try{if(!localStorage.getItem(KEY))localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}
 function prog(n){if(n.ref){const t=real(n);if(t!==n)return prog(t)}return n.auto&&n.children.length?Math.round(n.children.reduce((a,c)=>a+prog(c),0)/n.children.length):(n.progress||0)}
 
 /* ---------- palette ---------- */
@@ -534,21 +564,21 @@ function render(popId){
     d.style.display='block';d.style.setProperty('--dc',`var(--p${c.c})`);
     d.innerHTML=`<small>${c.children.length} sub-bubble${c.children.length===1?'':'s'}</small>`;
         const lu=safeUrl(c.link);
-    if(lu){const a=document.createElement('a');a.className='dlink';a.href=lu;a.target='_blank';a.rel='noopener';a.textContent='↗ '+new URL(lu).hostname.replace(/^www\./,'');const w=document.createElement('div');w.appendChild(a);d.appendChild(w)}
+    if(lu){const a=document.createElement('a');a.className='dlink';a.href=lu;if(!isObs(lu)){a.target='_blank';a.rel='noopener'}a.textContent=isObs(lu)?'↗ Obsidian note':'↗ '+new URL(lu).hostname.replace(/^www\./,'');const w=document.createElement('div');w.appendChild(a);d.appendChild(w)}
   }else d.style.display='none';
   updateNoteCard();
 }
 
-function allTodos(n,path,out){if(n.task&&n.due&&prog(n)<100)out.push({t:{text:n.name,due:n.due},n,path:path.slice(0,-1)});(n.todos||[]).forEach(t=>{if(!t.done&&t.due)out.push({t,n,path})});(n.children||[]).forEach(c=>allTodos(c,[...path,c],out));return out}
+function allTodos(n,path,out){if(n.task&&n.due&&prog(n)<100)out.push({t:{text:n.name,due:n.due},dt:n.due,n,path:path.slice(0,-1)});(n.todos||[]).forEach(t=>{const dt=t.due||t.plan;if(!t.done&&dt)out.push({t,dt,n,path})});(n.children||[]).forEach(c=>allTodos(c,[...path,c],out));return out}
 var tlMode='month';try{tlMode=localStorage.getItem('tl-mode-'+KEY)||'month'}catch(e){}
 function paintTlCtl(){document.querySelectorAll('#tlctl button').forEach(b=>b.classList.toggle('on',b.dataset.m===tlMode))}
 document.querySelectorAll('#tlctl button').forEach(b=>b.onclick=()=>{tlMode=b.dataset.m;try{localStorage.setItem('tl-mode-'+KEY,tlMode)}catch(e){}paintTlCtl();drawTimeline()});
 function drawTimeline(){paintTlCtl();
   const tl=$('#timeline');
-  const items=allTodos(cur(),trail.slice(1),[]).sort((a,b)=>a.t.due<b.t.due?-1:a.t.due>b.t.due?1:0);
+  const items=allTodos(cur(),trail.slice(1),[]).sort((a,b)=>(a.dt+(a.t.time||''))<(b.dt+(b.t.time||''))?-1:(a.dt+(a.t.time||''))>(b.dt+(b.t.time||''))?1:0);
   const keep=tl._drawn?tl.scrollLeft:null;
   const dn=iso=>{const [y,m,d]=iso.split('-').map(Number);return Date.UTC(y,m-1,d)/864e5};
-  const today=dn(todayISO()),first=items.length?dn(items[0].t.due):today,last=items.length?dn(items[items.length-1].t.due):today+60;
+  const today=dn(todayISO()),first=items.length?dn(items[0].dt):today,last=items.length?dn(items[items.length-1].dt):today+60;
   const start=Math.min(today,first)-5,end=Math.max(today,last)+14,vw=tl.clientWidth||innerWidth,span=end-start,PX=tlMode==='week'?(vw-120)/8:tlMode==='month'?(vw-120)/32:tlMode==='all'?Math.max(3,(vw-160)/span):16,W=Math.max(span*PX+80,vw);
   const inn=document.createElement('div');inn.className='tl-in';inn.style.width=W+'px';
   inn.innerHTML='<div class="tl-axis"></div>';
@@ -561,21 +591,21 @@ function drawTimeline(){paintTlCtl();
   inn.insertAdjacentHTML('beforeend',`<div class="tl-today" style="left:${(today-start)*PX}px"><b>today</b></div>`);
   const laneEnd=[-1e9,-1e9,-1e9];
   items.forEach(it=>{
-    const x=(dn(it.t.due)-start)*PX,label=it.t.text.length>34?it.t.text.slice(0,33)+'…':it.t.text;
-    const dd=new Date(it.t.due+'T00:00:00'),ds=dd.getDate()+' '+MN[dd.getMonth()],w=Math.min(300,62+label.length*6+ds.length*5.5);
+    const full=(it.t.time?it.t.time+' ':'')+it.t.text,x=(dn(it.dt)-start)*PX,label=full.length>34?full.slice(0,33)+'…':full;
+    const dd=new Date(it.dt+'T00:00:00'),ds=dd.getDate()+' '+MN[dd.getMonth()],w=Math.min(300,62+label.length*6+ds.length*5.5);
     let l=laneEnd.findIndex(e=>x>=e+6);if(l<0)l=laneEnd.indexOf(Math.min(...laneEnd));
     laneEnd[l]=x+w;
     const c=document.createElement('div');
-    c.className='tl-c'+(it.t.due<todayISO()?' late':'');
+    c.className='tl-c'+(it.dt<todayISO()?' late':'')+(it.t.due?'':' planned');
     c.style.cssText=`left:${(x-4).toFixed(0)}px;top:${4+l*23}px;--c:var(--p${it.n.c})`;
-    c.title=it.n.name+' — '+it.t.text;
+    c.title=it.n.name+' — '+full+(it.t.due?'':' (planned in the week)');
     c.innerHTML='<i></i><span></span><small></small>';
     c.children[1].textContent=label;c.children[2].textContent=ds;
     c.onclick=()=>{location.hash=hashFor([state.root,...it.path])};
     const d=document.createElement('div');d.className='tl-d';d.style.cssText=`left:${x.toFixed(0)}px;--c:var(--p${it.n.c})`;
     inn.append(d,c);
   });
-  if(!items.length)inn.insertAdjacentHTML('beforeend','<div class="tl-empty">No dated to-dos here yet — add a to-do with a due date and it appears on this line</div>');
+  if(!items.length)inn.insertAdjacentHTML('beforeend','<div class="tl-empty">No dated to-dos here yet — add a to-do with a due date (or plan it in the week) and it appears on this line</div>');
   tl.innerHTML='';tl.appendChild(inn);
   tl.scrollLeft=(keep!==null&&tl._node===cur().id&&tl._mode===tlMode)?keep:(tlMode==='all'?0:Math.max(0,(today-start)*PX-90));tl._drawn=true;tl._node=cur().id;tl._mode=tlMode;
   return false;
@@ -794,14 +824,16 @@ function openPanel(n,el,parent){
     <div id="pn-notes"><textarea class="notes" id="nt" placeholder="Notes…"></textarea></div>
     <div id="pn-todo"></div>
     ${n.task?'<div class="trow"><label class="chk"><input type="checkbox" id="dn"> done</label><input type="date" class="t-date" id="due" title="Due date"></div>':''}
-    <input class="name lnk-in" id="lk" placeholder="Link · https://…" spellcheck="false">
+    <input class="name lnk-in" id="lk" placeholder="Link · https://… or [[Obsidian note]]" spellcheck="false">
     <input type="range" id="rg" min="0" max="100" step="1">
     <div class="sw" id="sw">${swatches(n.c)}</div>
     <div class="mgb" id="mgb" style="display:none"></div>
+    <div id="mvbox" style="display:none;margin:8px 0;text-align:left"><input class="name" id="mvq" placeholder="Move to… (search a project)" spellcheck="false"><div id="mvl" style="max-height:150px;overflow-y:auto;margin-top:6px"></div></div>
     <div id="mgbox" style="display:none"><input class="name" id="mgq" placeholder="Search a bubble to merge with…" spellcheck="false"><div id="mgl"></div></div>
     <div class="row">
       <button class="btn primary" id="open">Open page</button>
       <button class="btn" id="mg">⛓ Merge with…</button>
+      <button class="btn" id="mv">↪ Move to…</button>
       <a class="btn" id="go" target="_blank" rel="noopener" style="display:none;text-decoration:none">Website ↗</a>
       ${hasKids?'<label class="chk"><input type="checkbox" id="auto"> average of sub-bubbles</label>':''}
       <button class="btn" id="tk">${n.task?'● Make bubble':'★ Make task'}</button>
@@ -831,7 +863,7 @@ function openPanel(n,el,parent){
   tabNotes.onclick=()=>showTab('notes');tabTodo.onclick=()=>showTab('todo');
   showTab((n.notes&&n.notes.trim())||!openCount(n)?'notes':'todo');
   const lk=$$('#lk'),go=$$('#go');
-  const paintLink=()=>{const u=safeUrl(n.link);go.style.display=u?'':'none';if(u)go.href=u};
+  const paintLink=()=>{const u=safeUrl(n.link);go.style.display=u?'':'none';if(u){go.href=u;go.textContent=isObs(u)?'Obsidian ↗':'Website ↗';if(isObs(u)){go.removeAttribute('target');go.removeAttribute('rel')}else{go.target='_blank';go.rel='noopener'}}};
   lk.value=n.link||'';lk.oninput=e=>{n.link=e.target.value.trim();save();paintLink()};paintLink();
   $$('#nm').oninput=e=>{n.name=e.target.value||'Untitled'};
   $$('#rg').oninput=e=>{n.progress=+e.target.value;paint()};
@@ -881,6 +913,28 @@ function openPanel(n,el,parent){
       if(!l.children.length){l.innerHTML='<div class="mgi" style="cursor:default">No match</div>'}
     };
     $$('#mg').onclick=()=>{box.style.display=box.style.display==='none'?'block':'none';if(box.style.display==='block'){draw();q.focus()}};
+    q.oninput=draw;
+  }
+  {
+    const box=$$('#mvbox'),q=$$('#mvq'),l=$$('#mvl'),par=parent||cur();
+    const skip=new Set();(function w(x){skip.add(x.id);x.children.forEach(w)})(n);
+    const dests=[{x:state.root,label:'Home (top level)'}];
+    (function w(x,pth){if(x!==state.root&&!skip.has(x.id)&&!x.ref&&!x.task)dests.push({x,label:[...pth,x.name].join(' › ')});x.children.forEach(c=>w(c,x===state.root?[]:[...pth,x.name]))})(state.root,[]);
+    const list=dests.filter(d=>d.x!==par);
+    const draw=()=>{
+      const k=q.value.trim().toLowerCase();l.innerHTML='';
+      list.filter(d=>!k||d.label.toLowerCase().includes(k)).slice(0,60).forEach(d=>{
+        const e=document.createElement('div');e.className='mgi';e.textContent=d.label;
+        e.onclick=()=>{
+          par.children=par.children.filter(x=>x!==n);
+          const was=d.x.children.length;d.x.children.push(n);
+          if(!was&&d.x!==state.root&&!d.x.progress)d.x.auto=true;
+          save();o.remove();render();toast('Moved "'+n.name+'" to "'+(d.x===state.root?'Home':d.x.name)+'"');
+        };
+        l.appendChild(e)});
+      if(!l.children.length)l.innerHTML='<div class="mgi" style="cursor:default">No match</div>';
+    };
+    $$('#mv').onclick=()=>{const mb=$$('#mgbox');if(mb)mb.style.display='none';box.style.display=box.style.display==='none'?'block':'none';if(box.style.display==='block'){draw();q.focus()}};
     q.oninput=draw;
   }
   const au=$$('#auto');
@@ -934,32 +988,6 @@ function openNew(at){
   o.addEventListener('pointerdown',e=>{if(e.target===o)o.remove()});
 }
 $('#add').onclick=()=>openNew();
-function openWelcome(first){
-  closeOverlay();
-  const o=document.createElement('div');o.id='overlay';
-  o.innerHTML=`<div class="newcard wl" style="--c:var(--p0);width:min(540px,92vw);text-align:center"><h3>Welcome to Orbit</h3>
-    <p>Track your projects as a little solar system. Everything stays in your browser — no account, no server.</p>
-    <ul>
-      <li><b>Home is the sun.</b> Each planet is a project and its liquid level is its progress. Double-click the sun to rename it.</li>
-      <li><b>Click a planet to fly in</b> and give it sub-projects (they orbit as moons). Click the sun inside, or press <b>Esc</b>, to fly back out.</li>
-      <li><b>Drag a planet onto the black hole</b> to edit it: name, colour, progress, notes, link and to-dos.</li>
-      <li><b>Drag a planet onto another planet</b> to nest it as a sub-project.</li>
-      <li><b>★ Make task</b> turns a bubble into a glowing star. Hover a star to read it; click a to-do star to tick it off.</li>
-      <li><b>To-dos with due dates</b> show up as stars in the orbit and on the timeline at the top. Zoom it with Week / Month / 3 mo / All.</li>
-      <li><b>⛓ Merge</b> links a bubble to another one, so the same thing can live in two places.</li>
-      <li><b>Closer = more done.</b> The further a planet's progress, the closer it orbits the sun.</li>
-      <li><b>Saving:</b> changes are kept in this browser automatically. <b>Link file</b> (Chrome / Edge) autosaves to a JSON file you choose; <b>Save / Load</b> make a backup anywhere.</li>
-    </ul>
-    <div class="row">${first?'<button class="btn primary" id="wl-go">Explore the example</button><button class="btn" id="wl-new">Start fresh</button>':'<button class="btn primary" id="wl-go">Got it</button>'}</div><div class="wl-foot">© 2026 Elena Teissier · MIT License</div></div>`;
-  document.body.appendChild(o);
-  const done=()=>{try{localStorage.setItem('orbit-welcome-v1','1')}catch(e){}o.remove()};
-  o.querySelector('#wl-go').onclick=done;
-  const nw=o.querySelector('#wl-new');
-  if(nw)nw.onclick=()=>{state=seed();trail=[state.root];location.hash='#/';save();done();render()};
-  o.addEventListener('pointerdown',e=>{if(e.target===o)done()});
-}
-$('#help').onclick=()=>openWelcome(false);
-(function(){let seen=false;try{seen=localStorage.getItem('orbit-welcome-v1')}catch(e){}if(!seen)setTimeout(()=>openWelcome(true),700)})();
 stage.addEventListener('dblclick',e=>{
   if(e.target!==stage)return;
   const r=stage.getBoundingClientRect();
@@ -983,7 +1011,7 @@ $('#imp').onclick=()=>$('#file').click();
 $('#file').onchange=e=>{
   const f=e.target.files[0];if(!f)return;
   const fr=new FileReader();
-  fr.onload=()=>{try{const s=JSON.parse(fr.result);if(!s.root)throw 0;state=s;save();trail=[state.root];location.hash='#/';applyPalette();render();toast('Backup loaded')}catch(_){toast('That file is not a bubbles backup')}};
+  fr.onload=()=>{try{const s=JSON.parse(fr.result);if(!s.root)throw 0;migrate(s);fixAuto(s.root);state=s;save();trail=[state.root];location.hash='#/';applyPalette();render();toast('Backup loaded')}catch(_){toast('That file is not a bubbles backup')}};
   fr.readAsText(f);e.target.value='';
 };
 
@@ -1005,7 +1033,7 @@ var fh=null,fT=0;
     if(!fh)return;clearTimeout(fT);
     fT=setTimeout(async()=>{try{const w=await fh.createWritable();await w.write(JSON.stringify(state,null,2));await w.close();paint('on')}catch(e){paint('ask')}},400);
   };
-  const apply=s=>{fixAuto(s.root);state=s;save();trail=[state.root];location.hash='#/';applyPalette();render()};
+  const apply=s=>{migrate(s);fixAuto(s.root);state=s;save();trail=[state.root];location.hash='#/';applyPalette();render()};
   const readFile=async()=>{try{const t=await (await fh.getFile()).text();if(!t.trim())return null;const s=JSON.parse(t);return s&&s.root?s:null}catch(e){return null}};
   btn.onclick=async()=>{
     try{
@@ -1015,7 +1043,7 @@ var fh=null,fT=0;
       }
       if(fh){ // stored handle, needs permission
         if(await fh.requestPermission({mode:'readwrite'})==='granted'){
-          const s=await readFile();if(s)apply(s);else window.fileSync();
+          const s=await readFile();if(s&&(s._mod||0)>=(state._mod||0))apply(s);else window.fileSync();
           paint('on');toast('Autosave on');
         }
         return;
@@ -1032,12 +1060,55 @@ var fh=null,fT=0;
     const h=await idbGet();if(!h){paint('off');return}
     fh=h;
     try{
-      if(await h.queryPermission({mode:'readwrite'})==='granted'){const s=await readFile();if(s)apply(s);paint('on')}
+      if(await h.queryPermission({mode:'readwrite'})==='granted'){const s=await readFile();if(s&&(s._mod||0)>=(state._mod||0))apply(s);else window.fileSync();paint('on')}
       else paint('ask');
     }catch(e){paint('ask')}
   })();
 })();
 
+
+function openWelcome(first){
+  closeOverlay();
+  const o=document.createElement('div');o.id='overlay';
+  o.innerHTML=`<div class="newcard wl" style="--c:var(--p0);width:min(540px,92vw);text-align:center"><h3>Welcome to Orbit</h3>
+    <p>Track your projects as a little solar system. Everything stays in your browser — no account, no server.</p>
+    <ul>
+      <li><b>Home is the sun.</b> Each planet is a project and its liquid level is its progress. Double-click the sun to rename it.</li>
+      <li><b>Click a planet to fly in</b> and give it sub-projects (they orbit as moons). Click the sun inside, or press <b>Esc</b>, to fly back out.</li>
+      <li><b>Drag a planet onto the black hole</b> to edit it: name, colour, progress, notes, link and to-dos.</li>
+      <li><b>Drag a planet onto another planet</b> to nest it as a sub-project.</li>
+      <li><b>★ Make task</b> turns a bubble into a glowing star. Hover a star to read it; click a to-do star to tick it off.</li>
+      <li><b>To-dos with due dates</b> show up as stars in the orbit and on the timeline at the top. Zoom it with Week / Month / 3 mo / All.</li>
+      <li><b>Time + notes:</b> give a to-do a time and it becomes an event. A bubble's link can be a website or an Obsidian note, like <b>[[My note]]</b>.</li>
+      <li><b>Week ↗</b> opens the weekly planner: drag your tasks onto days, plan around events and focus blocks. Tasks you add there live in a bubble and stay in sync.</li>
+      <li><b>⛓ Merge</b> links a bubble to another one, so the same thing can live in two places.</li>
+      <li><b>Closer = more done.</b> The further a planet's progress, the closer it orbits the sun.</li>
+      <li><b>Saving:</b> changes are kept in this browser automatically. <b>Link file</b> (Chrome / Edge) autosaves to a JSON file you choose; <b>Save / Load</b> make a backup anywhere.</li>
+    </ul>
+    <div class="row">${first?'<button class="btn primary" id="wl-go">Explore the example</button><button class="btn" id="wl-new">Start fresh</button>':'<button class="btn primary" id="wl-go">Got it</button>'}</div><div class="wl-foot">© 2026 Elena Teissier · MIT License</div></div>`;
+  document.body.appendChild(o);
+  const done=()=>{try{localStorage.setItem('orbit-welcome-v1','1')}catch(e){}o.remove()};
+  o.querySelector('#wl-go').onclick=done;
+  const nw=o.querySelector('#wl-new');
+  if(nw)nw.onclick=()=>{state=seed();trail=[state.root];location.hash='#/';save();done();render()};
+  o.addEventListener('pointerdown',e=>{if(e.target===o)done()});
+}
+$('#help').onclick=()=>openWelcome(false);
+(function(){let seen=false;try{seen=localStorage.getItem('orbit-welcome-v1')}catch(e){}if(!seen)setTimeout(()=>openWelcome(true),700)})();
+/* Obsidian links: ask for the vault name once */
+document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href^="obsidian://"]');if(!a)return;
+  let has='';try{has=localStorage.getItem('orbit-vault')||''}catch(_){}
+  if(has)return;e.preventDefault();
+  const v=prompt('Name of your Obsidian vault (asked once):','');if(!v||!v.trim())return;
+  try{localStorage.setItem('orbit-vault',v.trim())}catch(_){}
+  location.href=a.href.replace(/vault=[^&]*/,'vault='+encodeURIComponent(v.trim()));
+},true);
+/* ---------- changes made in the weekly planner ---------- */
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden)return;
+  try{const s=JSON.parse(localStorage.getItem(KEY));
+    if(s&&s.root&&(s._mod||0)>(state._mod||0)){migrate(s);fixAuto(s.root);state=s;trail=[state.root];location.hash='#/';render();if(window.fileSync)window.fileSync()}}catch(e){}
+});
 
 /* ---------- starfield ---------- */
 const layers=[];
@@ -1138,6 +1209,22 @@ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)requestAnimationFrame
 let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!$('#overlay'))render()},200)});
 
 buildPalMenu();applyPalette();route(true);
+</script>
+<div id="warpfx"></div>
+<script>
+(function(){
+  const fx=document.getElementById('warpfx');
+  document.getElementById('weekBtn').addEventListener('click',e=>{
+    if(e.metaKey||e.ctrlKey||e.shiftKey)return;
+    e.preventDefault();const h=e.currentTarget.href;
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches){location.href=h;return}
+    document.body.classList.add('warp-out');setTimeout(()=>location.href=h,520);
+  });
+  if(/from=week/.test(location.search)){
+    fx.classList.add('arrive');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{fx.style.transition='opacity 1s ease-out';fx.classList.remove('arrive')}));
+  }
+})();
 </script>
 </body>
 </html>
