@@ -259,6 +259,12 @@ html.dune .sun.home .sunglow{background:radial-gradient(circle,rgba(255,226,170,
 html.dune .worb .in{background:#000;border:0;box-shadow:0 0 0 2px #fff4dc,0 0 10px 3px rgba(255,236,190,.8),0 0 26px 8px rgba(255,170,80,.35)}
 html.dune .worb .fill{display:none}
 html.dune .worb .num{color:#f6e9cf}
+/* week page: a big eclipse instead of the planet */
+html.dune .bg::after{display:none}
+html.dune .bg .world{display:block;position:absolute;left:50%;top:auto;bottom:-8vmin;width:46vmin;height:46vmin;margin-left:-23vmin;border-radius:50%;background:#000;border:0;filter:none;opacity:1;
+  box-shadow:0 0 0 .7vmin #fff4dc,0 0 0 1.1vmin rgba(255,214,150,.5),0 0 3vmin 1.2vmin rgba(255,236,190,.85),0 0 10vmin 4vmin rgba(255,180,90,.45),0 0 26vmin 9vmin rgba(255,130,50,.2);animation:corona 7s ease-in-out infinite alternate}
+@keyframes corona{from{filter:brightness(.88)}to{filter:brightness(1.12)}}
+html.dune.light .bg .world{opacity:.85}
 html.dune .btn.primary,html.dune #addBtn,html.dune .btn.on{background:linear-gradient(180deg,#f4cb74,#c58a2a);color:#1b1206;border-color:#f7d98e}
 html.dune:not(.light) .btn.primary,html.dune:not(.light) .btn.on{color:#1b1206}
 html.dune .day.rb,html.dune .tk{border-radius:3px}
