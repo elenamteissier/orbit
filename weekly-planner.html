@@ -2,6 +2,7 @@
 <!-- Orbit Week — © 2026 Elena Teissier. Released under the MIT License. -->
 <html lang="en">
 <head>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Week · Orbit</title>
@@ -233,17 +234,29 @@ html.light .bg .glow{opacity:.07}html.light .bg .world{opacity:.3}
 html.light.rainbow .bg .glow{opacity:.1}
 html.light ::selection{background:rgba(58,123,255,.25)}
 
-/* ===== Dune theme (the film): hazy ochre, sharp ridges, a pale hot sun ===== */
-html.dune:not(.light){--w:238,222,198;--pn:24,19,15;--bg0:#14100c;--bg1:#3b2c1f;--star:#e8d5b5;--ink:#f0e4d0;--card:rgba(238,222,198,.06);--line:rgba(238,222,198,.2)}
-html.dune:not(.light),html.dune:not(.light) body{background:linear-gradient(180deg,#14100c 0%,#2f2318 45%,#a67a4d 100%) fixed}
-html.dune.light{--w:62,46,30;--pn:250,244,233;--bg0:#e9dcc3;--bg1:#f6eddc;--star:rgba(120,90,55,.45);--ink:#2b2218;--card:rgba(250,244,233,.92);--line:rgba(62,46,30,.32)}
-html.dune.light,html.dune.light body{background:linear-gradient(180deg,#f6eddc 0%,#e6d3ae 65%,#cfae7c 100%) fixed}
-html.dune .bg .glow,html.dune .bg .blob{opacity:.1;background:#d9a066}
+/* ===== Dune theme (Imperium): gold + ember, chamfered panels, serif caps, planet rim ===== */
+html.dune:not(.light){--w:244,226,190;--pn:14,16,32;--bg0:#070a16;--bg1:#1a1530;--star:#e8dcc0;--ink:#f3e6c8;--card:rgba(20,24,46,.72);--line:rgba(232,177,79,.35)}
+html.dune:not(.light),html.dune:not(.light) body{background:radial-gradient(ellipse 80% 55% at 50% 118%,rgba(200,64,42,.5),transparent 65%),radial-gradient(ellipse 70% 40% at 50% -10%,rgba(232,177,79,.16),transparent 70%),linear-gradient(180deg,#060917 0%,#0d1228 55%,#1d0f14 100%) fixed}
+html.dune.light{--w:60,40,20;--pn:252,246,232;--bg0:#efe2c6;--bg1:#f8efd9;--star:rgba(150,105,40,.45);--ink:#2a1c0e;--card:rgba(252,246,232,.94);--line:rgba(150,100,30,.5)}
+html.dune.light,html.dune.light body{background:radial-gradient(ellipse 80% 50% at 50% 120%,rgba(200,100,50,.3),transparent 65%),linear-gradient(180deg,#f8efd9 0%,#ecd9b0 100%) fixed}
+html.dune .bg .glow,html.dune .bg .blob{opacity:.1;background:#e6b14f}
 html.dune .bg .world{display:none}
 html.dune .bg::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
-  background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1440 320%22 preserveAspectRatio=%22none%22%3E%3Cpath d=%22M0 200 C200 150 330 190 520 170 C720 150 860 110 1060 150 C1220 180 1330 140 1440 160 L1440 320 L0 320Z%22 fill=%22%235c4129%22/%3E%3Cpath d=%22M0 320 L0 250 Q150 225 330 140 L345 148 L345 320Z M600 320 L600 262 Q760 240 900 110 L915 120 L915 320Z M1180 320 L1180 268 Q1260 240 1330 150 L1342 158 L1342 320Z%22 fill=%22%237f5c3a%22/%3E%3Cpath d=%22M330 140 Q400 230 600 262 L600 320 L345 320 L345 148Z M900 110 Q980 230 1180 268 L1180 320 L915 320 L915 120Z M1330 150 Q1380 230 1440 250 L1440 320 L1342 320 L1342 158Z%22 fill=%22%23241811%22/%3E%3C/svg%3E") bottom/100% 27vh no-repeat,radial-gradient(circle 340px at 70% 70%,rgba(255,170,90,.38),rgba(255,150,70,.12) 55%,transparent 72%) no-repeat}
-html.dune.light .bg::after{background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1440 320%22 preserveAspectRatio=%22none%22%3E%3Cpath d=%22M0 200 C200 150 330 190 520 170 C720 150 860 110 1060 150 C1220 180 1330 140 1440 160 L1440 320 L0 320Z%22 fill=%22%23d3b88e%22/%3E%3Cpath d=%22M0 320 L0 250 Q150 225 330 140 L345 148 L345 320Z M600 320 L600 262 Q760 240 900 110 L915 120 L915 320Z M1180 320 L1180 268 Q1260 240 1330 150 L1342 158 L1342 320Z%22 fill=%22%23e3c79a%22/%3E%3Cpath d=%22M330 140 Q400 230 600 262 L600 320 L345 320 L345 148Z M900 110 Q980 230 1180 268 L1180 320 L915 320 L915 120Z M1330 150 Q1380 230 1440 250 L1440 320 L1342 320 L1342 158Z%22 fill=%22%239b7a55%22/%3E%3C/svg%3E") bottom/100% 27vh no-repeat,radial-gradient(circle 340px at 70% 70%,rgba(240,170,90,.35),transparent 70%) no-repeat}
-html.dune:not(.light) .btn.primary,html.dune:not(.light) .btn.on{color:#1a120a}
+  background:radial-gradient(circle 46vmax at 66% 128%,#c28a52 0%,#8f5a2e 48%,#4a2a14 70%,rgba(90,50,24,0) 71%) no-repeat,radial-gradient(circle 50vmax at 66% 128%,rgba(255,190,110,.18) 88%,transparent 100%) no-repeat;opacity:.9}
+html.dune.light .bg::after{opacity:.55}
+html.dune .title,html.dune .wk .range,html.dune .dn,html.dune #detail h1,html.dune .bh h3,html.dune .crumbs .cur{font-family:'Cinzel','Trajan Pro','Cormorant SC',Georgia,serif;letter-spacing:.14em}
+html.dune #detail h1,html.dune .title b{color:#f0c46a;text-shadow:0 0 26px rgba(232,177,79,.35)}
+html.dune.light #detail h1,html.dune.light .title b{color:#8a5a14;text-shadow:none}
+html.dune .btn,html.dune .panel{border-radius:2px;clip-path:polygon(9px 0,calc(100% - 9px) 0,100% 9px,100% calc(100% - 9px),calc(100% - 9px) 100%,9px 100%,0 calc(100% - 9px),0 9px)}
+html.dune .panel{border-color:rgba(232,177,79,.45);box-shadow:inset 0 0 0 1px rgba(232,177,79,.12),inset 0 1px 18px rgba(232,177,79,.08)}
+html.dune .btn{border-color:rgba(232,177,79,.5);background:linear-gradient(180deg,rgba(232,177,79,.14),rgba(20,24,46,.6));text-transform:uppercase;letter-spacing:.1em;font-size:11px}
+html.dune.light .btn{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(232,200,140,.5));border-color:rgba(150,100,30,.55)}
+html.dune .btn:hover{border-color:#f0c46a;box-shadow:0 0 14px rgba(232,177,79,.35)}
+html.dune .btn.primary,html.dune #addBtn,html.dune .btn.on{background:linear-gradient(180deg,#f4cb74,#c58a2a);color:#1b1206;border-color:#f7d98e}
+html.dune:not(.light) .btn.primary,html.dune:not(.light) .btn.on{color:#1b1206}
+html.dune .day.rb,html.dune .tk{border-radius:3px}
+html.dune .tk{border-color:rgba(232,177,79,.3)}
+html.dune.light .tk{border-color:rgba(150,100,30,.4)}
 </style>
 </head>
 <body>
@@ -299,7 +312,7 @@ function defaults(){return{
 const PALETTES={
   Spectrum:['#12d6ff','#3a7bff','#9b5cff','#ff4fd8','#ff3b5c','#ff8a1f','#ffd400','#3be36b'],
   Rainbow:['#ff3b30','#ff9500','#ffd60a','#34c759','#00c7be','#0a84ff','#bf5af2','#ff2d92'],
-  Dune:['#d9a066','#b87d4b','#8c5a3c','#e6d3b3','#7f8c8e','#a1887a','#c9a46b','#6b5645'],
+  Dune:['#e6b14f','#c8402a','#3fb6c4','#f2d49a','#5fa8d3','#8fd14f','#e0793a','#a53a52'],
   Nebula:['#7c4dff','#00e5ff','#ff2d95','#536dfe','#1de9b6','#ff6e40','#b388ff','#40c4ff'],
   Aurora:['#00f5a0','#00d9f5','#7b61ff','#c04dff','#00e0b8','#4dffb0','#5aa9ff','#b8ff6a'],
   Ocean:['#00c6ff','#0072ff','#00d4aa','#4facfe','#0fd3d3','#2b5cff','#7ee8fa','#00e5ff'],
