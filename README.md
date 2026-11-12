@@ -4,7 +4,7 @@
 
 Two plain HTML files. No install, no server, no account. Your data stays in your browser.
 
-
+**Live demo:** https://elenamteissier.github.io/orbit/ · **Weekly planner:** https://elenamteissier.github.io/orbit/weekly-planner.html
 
 ![Home view](assets/home.png)
 
@@ -30,14 +30,30 @@ Want it online? Enable **GitHub Pages** (Settings → Pages → *Deploy from a b
 | **Times = events** | Give a to-do a time and it becomes an event, shown with its time on the timeline. |
 | **Obsidian links** | A bubble's link can point to a note: type `[[My note]]` (Orbit asks for your vault name once). |
 | **Palettes** | 16 colour palettes, shared with the weekly planner. |
+| **Smart progress** | A bubble's percentage is the share of its to-dos that are done (counting its sub-bubbles too). Or switch to **sub-bubbles** or **by hand**, then drag the ring or type a number. |
+| **✦ Constellation** | A mind map for every bubble: its to-dos are stars you can drag anywhere and connect with lines, plus free notes. It stays still, so it's a calm overview (see below). |
+| **Light or dark** | **☀ Light / ☾ Dark** switches the theme on both pages and remembers your choice. |
 | **Week ↗** | Opens the weekly planner (see below). |
 | **Home is yours** | Double-click the sun to rename it — use it for projects, hobbies, gifts, birthdays, anything. |
 
 ![A project page](assets/project.png)
 
+## Constellation
+
+![Constellation](assets/constellation.png)
+
+Open it with **✦ Map** in the top bar (or **✦ Constellation** in a bubble's panel).
+
+- Every to-do of the bubble is a star with its full text. Sub-bubbles show up as small planets, with their own to-dos as stars around them (you can drag and edit those too). **◌ Sub-planet tasks** hides or shows them.
+- **Drag** stars anywhere. **Click** one for options: done, edit, connect, delete.
+- **Connect** (button or per star) then click two stars to draw or cut a line. Click a line to remove it.
+- **+ Star** adds a to-do, **+ Note** a free note, and a double-click on empty space adds a note right there.
+
 ## Weekly planner
 
 ![Weekly planner](assets/week.png)
+
+![Light theme](assets/home-light.png)
 
 `weekly-planner.html` is a separate page, opened with the **Week ↗** button (and **← Orbit** takes you back).
 
@@ -67,8 +83,3 @@ Plain HTML, CSS and JavaScript — no dependencies, no build step. Orbit lives i
 ## License
 
 MIT — © 2026 Elena Teissier. See [LICENSE](LICENSE).
-
-## Contributors
-
-- Elena Teissier
-- Claude (Anthropic)
