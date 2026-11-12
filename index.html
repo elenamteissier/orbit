@@ -1280,7 +1280,7 @@ function openConstellation(n0){
   tool.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.a;
     if(a==='cut'){M.links.splice(selLink,1);selLink=null;persist();refresh()}
     else if(a==='done'){const x=byId(sel);if(x.kid){const k=kidOf(x);if(k){k.progress=prog(k)>=100?0:100;k.pm='manual';persist();refresh()}}else{const t=tdOf(x);if(t){t.done=!t.done;persist();refresh()}}}
-    else if(a==='open'){const k=kidOf(byId(sel));if(k){stopFlow();persist();window.removeEventListener('keydown',key,true);window.removeEventListener('resize',rs);el.remove();openConstellation(k)}}
+    else if(a==='open'){const k=kidOf(byId(sel));if(k&&!leaving){leaving=true;stopFlow();persist();bloom(true,()=>{teardown();openConstellation(k)})}}
     else if(a==='edit')edit(sel);
     else if(a==='conn'){connect=true;src=sel;$c('#clink').classList.add('on');refresh()}
     else if(a==='del'){if(!b._arm){b._arm=1;b.textContent='Sure?';return}remove(sel)}});
@@ -1296,7 +1296,22 @@ function openConstellation(n0){
   $c('#cphys').addEventListener('pointerdown',e=>e.stopPropagation());
   $c('#cadd').onclick=()=>addStar(false);$c('#cnote').onclick=()=>addStar(true);
   $c('#creset').onclick=e=>{const b=e.currentTarget;if(!b._arm){b._arm=1;b.textContent='Sure?';setTimeout(()=>{b._arm=0;b.textContent='✧ Tidy'},2500);return}b._arm=0;b.textContent='✧ Tidy';M.nodes.forEach(x=>{x.x=null;x.y=null});place();relax(500);persist();refresh()};
-  const close=()=>{stopFlow();window.removeEventListener('keydown',key,true);window.removeEventListener('resize',rs);el.remove();persist();render()};
+  /* transition: stars swirl out of / back into the planet */
+  let leaving=false;
+  const bloom=(rev,cb)=>{const cx=W/2,cy=H/2,reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;if(reduce){cb&&cb();return}
+    const ds=[...stars.querySelectorAll('.cs')];let last=0;
+    ds.forEach((d,i)=>{const x=byId(d.dataset.id);if(!x)return;const dx=cx-x.x*W,dy=cy-x.y*H,dist=Math.hypot(dx,dy)||1,
+      del=(rev?.35:1)*(Math.min(380,dist*.38)+(i%7)*16),dur=rev?560:1000,sw=(i%2?1:-1)*dist*.22,mx=dx*.5+(-dy/dist)*sw,my=dy*.5+(dx/dist)*sw;
+      const kf=[{translate:dx+'px '+dy+'px',scale:.05,opacity:0,rotate:'-80deg',offset:0},{translate:mx+'px '+my+'px',scale:.7,opacity:.8,rotate:'-30deg',offset:.55},{translate:'0px 0px',scale:1,opacity:1,rotate:'0deg',offset:1}];
+      d.animate(rev?kf.map(f=>({...f,offset:1-f.offset})).reverse():kf,{duration:dur,delay:del,easing:rev?'cubic-bezier(.55,0,.8,.4)':'cubic-bezier(.16,1,.3,1)',fill:rev?'both':'backwards'});last=Math.max(last,del+dur)});
+    lines.animate(rev?[{opacity:1},{opacity:0}]:[{opacity:0},{opacity:0,offset:.45},{opacity:1}],{duration:rev?260:1100,easing:'ease',fill:rev?'both':'backwards'});
+    [$c('#chead'),hint].forEach(q=>q&&q.animate(rev?[{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY(-8px)'}]:[{opacity:0,transform:'translateY(-10px)'},{opacity:1,transform:'translateY(0)'}],{duration:rev?300:800,delay:rev?0:350,easing:'ease',fill:rev?'both':'backwards'}));
+    cv.animate(rev?[{transform:'scale(1)',opacity:1},{transform:'scale(1.12)',opacity:0}]:[{transform:'scale(1.18)',opacity:0},{transform:'scale(1)',opacity:1}],{duration:rev?widthFix(last):1200,easing:'ease',fill:rev?'both':'backwards'});
+    el.animate(rev?[{opacity:1},{opacity:0}]:[{opacity:0},{opacity:1}],{duration:rev?Math.min(700,last+100):500,easing:'ease',fill:rev?'both':'backwards'});
+    if(rev&&cb)setTimeout(cb,Math.min(750,last+60))};
+  const widthFix=l=>Math.min(700,l+100);
+  const teardown=()=>{window.removeEventListener('keydown',key,true);window.removeEventListener('resize',rs);el.remove()};
+  const close=()=>{if(leaving)return;leaving=true;stopFlow();persist();bloom(true,()=>{teardown();render()})};
   $c('#cx').onclick=close;
   const key=e=>{const typing=/INPUT|TEXTAREA/.test(document.activeElement.tagName);if(typing)return;e.stopPropagation();
     if(e.key==='Escape'){if(connect){connect=false;src=null;$c('#clink').classList.remove('on');refresh()}else if(sel||selLink!=null){sel=null;selLink=null;refresh()}else close()}
@@ -1304,7 +1319,7 @@ function openConstellation(n0){
     else if((e.key==='Delete'||e.key==='Backspace')&&selLink!=null){M.links.splice(selLink,1);selLink=null;persist();refresh()}};
   window.addEventListener('keydown',key,true);
   const rs=()=>{bg();refresh()};window.addEventListener('resize',rs);
-  bg();relax(500);refresh();persist()}
+  bg();relax(500);refresh();persist();bloom(false)}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 document.getElementById('consBtn').onclick=()=>openConstellation(cur());
 
