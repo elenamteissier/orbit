@@ -232,6 +232,18 @@ html.light .btn{border-color:rgba(var(--w),.4)}
 html.light .bg .glow{opacity:.07}html.light .bg .world{opacity:.3}
 html.light.rainbow .bg .glow{opacity:.1}
 html.light ::selection{background:rgba(58,123,255,.25)}
+
+/* ===== Dune theme (Arrakis): sand, spice, twin moons ===== */
+html.dune:not(.light){--w:255,226,190;--pn:30,15,8;--bg0:#0d0704;--bg1:#4a210c;--star:#ffd9a0;--ink:#f7e8d0;--card:rgba(255,200,140,.07);--line:rgba(255,206,150,.2)}
+html.dune:not(.light),html.dune:not(.light) body{background:linear-gradient(180deg,#0b0604 0%,#24110a 45%,#8a4519 100%) fixed}
+html.dune.light{--w:74,42,14;--pn:255,248,234;--bg0:#efdcb8;--bg1:#fbf0d8;--star:rgba(170,100,30,.5);--ink:#2a190b;--card:rgba(255,248,234,.9);--line:rgba(74,42,14,.3)}
+html.dune.light,html.dune.light body{background:linear-gradient(180deg,#fbf0d8 0%,#f1d9a6 60%,#e2b571 100%) fixed}
+html.dune .bg .glow,html.dune .bg .blob{opacity:.2;background:#ff8a1f}html.dune.light .bg .glow,html.dune.light .bg .blob{opacity:.14}
+html.dune .bg .world{display:none}
+html.dune .bg::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(circle 17px at 84% 13%,rgba(248,231,194,.55) 97%,transparent) no-repeat,radial-gradient(circle 9px at 77% 23%,rgba(224,192,143,.5) 97%,transparent) no-repeat,url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1440 320%22 preserveAspectRatio=%22none%22%3E%3Cdefs%3E%3ClinearGradient id=%22a%22 x1=%220%22 y1=%220%22 x2=%220%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%237a3a14%22/%3E%3Cstop offset=%221%22 stop-color=%22%232a1208%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d=%22M0 190 C160 110 300 120 470 175 C620 225 760 130 930 120 C1100 110 1250 190 1440 150 L1440 320 L0 320Z%22 fill=%22%234a220d%22 opacity=%22.55%22/%3E%3Cpath d=%22M0 250 C140 190 330 200 520 240 C700 280 820 190 1010 190 C1200 190 1320 250 1440 235 L1440 320 L0 320Z%22 fill=%22url%28%23a%29%22/%3E%3C/svg%3E") bottom/100% 36vh no-repeat}
+html.dune.light .bg::after{background:radial-gradient(circle 17px at 84% 13%,#c98b3f 97%,transparent) no-repeat,radial-gradient(circle 9px at 77% 23%,#d9a766 97%,transparent) no-repeat,url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1440 320%22 preserveAspectRatio=%22none%22%3E%3Cdefs%3E%3ClinearGradient id=%22a%22 x1=%220%22 y1=%220%22 x2=%220%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%23e7b877%22/%3E%3Cstop offset=%221%22 stop-color=%22%23f4dcae%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d=%22M0 190 C160 110 300 120 470 175 C620 225 760 130 930 120 C1100 110 1250 190 1440 150 L1440 320 L0 320Z%22 fill=%22%23d9a45e%22 opacity=%22.55%22/%3E%3Cpath d=%22M0 250 C140 190 330 200 520 240 C700 280 820 190 1010 190 C1200 190 1320 250 1440 235 L1440 320 L0 320Z%22 fill=%22url%28%23a%29%22/%3E%3C/svg%3E") bottom/100% 36vh no-repeat;opacity:.9}
+html.dune:not(.light) .btn.primary,html.dune:not(.light) .btn.on{color:#1a0d05}
 </style>
 </head>
 <body>
@@ -287,6 +299,7 @@ function defaults(){return{
 const PALETTES={
   Spectrum:['#12d6ff','#3a7bff','#9b5cff','#ff4fd8','#ff3b5c','#ff8a1f','#ffd400','#3be36b'],
   Rainbow:['#ff3b30','#ff9500','#ffd60a','#34c759','#00c7be','#0a84ff','#bf5af2','#ff2d92'],
+  Dune:['#f0a63a','#d9692b','#b8461f','#f6d9a0','#5ec1d9','#8a4a2b','#ffc861','#e08a3c'],
   Nebula:['#7c4dff','#00e5ff','#ff2d95','#536dfe','#1de9b6','#ff6e40','#b388ff','#40c4ff'],
   Aurora:['#00f5a0','#00d9f5','#7b61ff','#c04dff','#00e0b8','#4dffb0','#5aa9ff','#b8ff6a'],
   Ocean:['#00c6ff','#0072ff','#00d4aa','#4facfe','#0fd3d3','#2b5cff','#7ee8fa','#00e5ff'],
@@ -307,7 +320,7 @@ const hex2rgb=h=>{h=h.replace('#','');return[0,2,4].map(i=>parseInt(h.slice(i,i+
 const lighten=(h,k)=>hex2rgb(h).map(v=>Math.round(v+(255-v)*k));
 function palKey(){const k=(typeof S!=='undefined'&&S&&S.palette)||'orbit';if(k==='orbit'){const o=orbitRead();const n=o&&o.s.palette;return PALETTES[n]?n:'Spectrum'}return PALETTES[k]?k:'Spectrum'}
 const ACC=()=>PALETTES[palKey()][0];
-function applyPal(){const c=PALETTES[palKey()],r=document.documentElement.style;document.documentElement.classList.toggle('rainbow',palKey()==='Rainbow');
+function applyPal(){const c=PALETTES[palKey()],r=document.documentElement.style;document.documentElement.classList.toggle('rainbow',palKey()==='Rainbow');document.documentElement.classList.toggle('dune',palKey()==='Dune');
  r.setProperty('--t',c[0]);r.setProperty('--b',c[1]);r.setProperty('--v',c[2]);r.setProperty('--r',c[4]);r.setProperty('--g',c[6]);
  r.setProperty('--tr',hex2rgb(c[0]).join(','));r.setProperty('--vr',hex2rgb(c[2]).join(','));r.setProperty('--hr',lighten(c[0],.45).join(','))}
 function fixTA(s){if(!Array.isArray(s.events))s.events=[];if(!Array.isArray(s.fixed))s.fixed=[];return s}
