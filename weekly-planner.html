@@ -203,6 +203,34 @@ html.light .t-row.late .t-date,html.light .pill.late,html.light .tk.late{color:#
 html.light .t-row.today .t-date,html.light .pill.soon{color:#a66a00}
 html.light .tl-c.late small{color:#c2321f}
 html.light #warpfx.arrive,html.light body.warp-out #warpfx{filter:none}
+
+/* rainbow palette: every weekday gets its own colour */
+.day.rb{border-color:rgba(var(--dcr),.6);background:linear-gradient(180deg,rgba(var(--dcr),.16),rgba(var(--dcr),.04) 55%),var(--card);box-shadow:inset 0 3px 0 var(--dc)}
+.day.rb .dd{color:var(--dc);font-weight:600}
+.day.rb .dorb .in{border-color:rgba(var(--dcr),.7)}
+.day.rb .dorb .fill{background:linear-gradient(180deg,rgba(var(--dcr),.7),var(--dc))}
+.day.rb.today{border-color:var(--dc);box-shadow:inset 0 3px 0 var(--dc),0 0 0 2px rgba(var(--dcr),.45),0 0 40px rgba(var(--dcr),.3)}
+.day.rb.today .dd{color:var(--dc)}
+.day.rb .tk{border-color:rgba(var(--dcr),.4)}
+html.rainbow .wk .range,html.rainbow .title b{background:linear-gradient(90deg,#ff3b30,#ff9500,#ffd60a,#34c759,#00c7be,#0a84ff,#bf5af2,#ff2d92);-webkit-background-clip:text;background-clip:text;color:transparent}
+html.rainbow .focus label:nth-child(1),html.rainbow .focus>div:nth-child(1) label{color:#ff3b30}html.rainbow .focus>div:nth-child(2) label{color:#ffb000}html.rainbow .focus>div:nth-child(3) label{color:#34c759}
+html.rainbow .focus>div:nth-child(1) input{border-color:rgba(255,59,48,.55)}html.rainbow .focus>div:nth-child(2) input{border-color:rgba(255,149,0,.55)}html.rainbow .focus>div:nth-child(3) input{border-color:rgba(52,199,89,.55)}
+html.rainbow .bg .g1{background:#ff3b30}html.rainbow .bg .g2{background:#0a84ff}html.rainbow .bg .glow{opacity:.16}
+html.rainbow body::before{content:"";position:fixed;left:0;right:0;top:0;height:4px;z-index:80;background:linear-gradient(90deg,#ff3b30,#ff9500,#ffd60a,#34c759,#00c7be,#0a84ff,#bf5af2,#ff2d92)}
+html.rainbow.light .day.rb{background:linear-gradient(180deg,rgba(var(--dcr),.22),rgba(var(--dcr),.07) 60%),#fff}
+html.rainbow.light .day.rb .dd{color:color-mix(in srgb,var(--dc) 72%,#000)}
+/* light theme: stronger contrast */
+html.light{--dim:rgba(var(--w),.78);--card:rgba(255,255,255,.86);--line:rgba(var(--w),.3);--ink:#0c1230}
+html.light .panel{background:rgba(255,255,255,.9);border-color:rgba(var(--w),.32);box-shadow:0 2px 10px rgba(24,32,64,.1)}
+html.light .tk{background:#fff;border-color:rgba(var(--w),.34);box-shadow:0 1px 4px rgba(24,32,64,.12)}
+html.light .tk:hover{background:#f4f6ff}
+html.light .tk.done{opacity:.7}.day.past,html.light .day.past{opacity:.88}
+html.light .pill{border-color:rgba(var(--w),.42)}
+html.light .fx{border-color:rgba(var(--w),.4);color:rgba(var(--w),.85)}
+html.light .focus input,html.light .addrow input,html.light .dadd input{background:#fff;border-color:rgba(var(--w),.38)}
+html.light .btn{border-color:rgba(var(--w),.4)}
+html.light .bg .glow{opacity:.07}html.light .bg .world{opacity:.3}
+html.light.rainbow .bg .glow{opacity:.1}
 html.light ::selection{background:rgba(58,123,255,.25)}
 </style>
 </head>
@@ -279,7 +307,7 @@ const hex2rgb=h=>{h=h.replace('#','');return[0,2,4].map(i=>parseInt(h.slice(i,i+
 const lighten=(h,k)=>hex2rgb(h).map(v=>Math.round(v+(255-v)*k));
 function palKey(){const k=(typeof S!=='undefined'&&S&&S.palette)||'orbit';if(k==='orbit'){const o=orbitRead();const n=o&&o.s.palette;return PALETTES[n]?n:'Spectrum'}return PALETTES[k]?k:'Spectrum'}
 const ACC=()=>PALETTES[palKey()][0];
-function applyPal(){const c=PALETTES[palKey()],r=document.documentElement.style;
+function applyPal(){const c=PALETTES[palKey()],r=document.documentElement.style;document.documentElement.classList.toggle('rainbow',palKey()==='Rainbow');
  r.setProperty('--t',c[0]);r.setProperty('--b',c[1]);r.setProperty('--v',c[2]);r.setProperty('--r',c[4]);r.setProperty('--g',c[6]);
  r.setProperty('--tr',hex2rgb(c[0]).join(','));r.setProperty('--vr',hex2rgb(c[2]).join(','));r.setProperty('--hr',lighten(c[0],.45).join(','))}
 function fixTA(s){if(!Array.isArray(s.events))s.events=[];if(!Array.isArray(s.fixed))s.fixed=[];return s}
@@ -344,9 +372,9 @@ function renderDays(){
     const d=dayIso(i),ts=tasksOn(d),fx=S.fixed.filter(f=>f.dow===i+1),evs=eventsOn(d);
     const fb=fixedBlocks(i),pb=plannedBlocks(d),cap=S.cap[i],used=fb+pb,over=used>cap;
     const done=ts.filter(t=>t.done).length,pct=ts.length?Math.round(done/ts.length*100):0;
-    const ring=cap?Math.min(1,used/cap):0,C=2*Math.PI*21,rc=over?'#ff6b5e':ring>.85?'#ffb703':ACC();
+    const RB=palKey()==='Rainbow',dcol=PALETTES.Rainbow[i],ring=cap?Math.min(1,used/cap):0,C=2*Math.PI*21,rc=RB?dcol:over?'#ff6b5e':ring>.85?'#ffb703':ACC();
     const day=document.createElement('div');
-    day.className='day panel'+(d===T?' today':'')+(d<T?' past':'')+(over?' over':'');
+    day.className='day panel'+(d===T?' today':'')+(d<T?' past':'')+(over?' over':'')+(RB?' rb':'');if(RB){day.style.setProperty('--dc',dcol);day.style.setProperty('--dcr',hex2rgb(dcol).join(','))}
     day.innerHTML=`<div class="dh"><div class="dorb"><svg viewBox="0 0 46 46"><circle cx="23" cy="23" r="21" fill="none" stroke="rgba(var(--w),.1)" stroke-width="2"/>
         <circle cx="23" cy="23" r="21" fill="none" stroke="${rc}" stroke-width="2" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-ring)}"/></svg>
         <div class="in"><div class="fill" style="height:${pct}%"></div></div></div>
