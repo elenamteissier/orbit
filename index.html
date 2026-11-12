@@ -1244,7 +1244,7 @@ function openConstellation(n0){
   const ropes=(reel)=>{pairs=[];const add=(a,b,k)=>{if(!a||!b||a===b)return;const A=XY(a),B=XY(b);pairs.push([a,b,Math.max(90,Math.min(reel?150:260,Math.hypot(A.x-B.x,A.y-B.y))),k])};
     M.nodes.forEach(x=>{if(x.sub&&vis(x))add(x,byId('k'+x.sub),.03)});M.links.forEach(l=>{const a=byId(l[0]),b=byId(l[1]);if(a&&b&&vis(a)&&vis(b))add(a,b,.02)})};
   const box=x=>{const t=label(x)||'x',w=Math.min(190,t.length*7.4)+40,h=Math.max(28,Math.ceil(t.length*7.4/190)*17+12),P=XY(x);return x.x>.72?{cx:P.x-w/2+16,cy:P.y,w,h}:{cx:P.x-16+w/2,cy:P.y,w,h}};
-  const step=()=>{const V=M.nodes.filter(vis),F=new Map(V.map(x=>[x,[0,0]])),bx=new Map(V.map(x=>[x,box(x)]));
+  const step=(fast)=>{const G=fast?1:.32,DP=fast?.8:.93,CAP=fast?22:7;const V=M.nodes.filter(vis),F=new Map(V.map(x=>[x,[0,0]])),bx=new Map(V.map(x=>[x,box(x)]));
     for(let i=0;i<V.length;i++)for(let j=i+1;j<V.length;j++){const a=V[i],b=V[j],A=bx.get(a),B=bx.get(b);let dx=A.cx-B.cx,dy=A.cy-B.cy;if(!dx&&!dy){dx=.5;dy=.5}
       const ox=(A.w+B.w)/2+16-Math.abs(dx),oy=(A.h+B.h)/2+12-Math.abs(dy);let fx=0,fy=0;
       if(ox>0&&oy>0){if(ox<oy)fx=Math.sign(dx)*ox*.3;else fy=Math.sign(dy)*oy*.3}
@@ -1253,14 +1253,14 @@ function openConstellation(n0){
     pairs.forEach(([a,b,L,k])=>{if(!F.has(a)||!F.has(b))return;const dx=b.x*W-a.x*W,dy=b.y*H-a.y*H,d=Math.hypot(dx,dy)||1,f=(d-L)*k*PH.pul;
       F.get(a)[0]+=dx/d*f;F.get(a)[1]+=dy/d*f;F.get(b)[0]-=dx/d*f;F.get(b)[1]-=dy/d*f});
     let e=0;V.forEach(x=>{if(x===pin){vel.set(x,[0,0]);return}const v=vel.get(x)||[0,0],f=F.get(x);
-      v[0]=Math.max(-22,Math.min(22,(v[0]+f[0])*.8));v[1]=Math.max(-22,Math.min(22,(v[1]+f[1])*.8));vel.set(x,v);
+      v[0]=Math.max(-CAP,Math.min(CAP,(v[0]+f[0]*G)*DP));v[1]=Math.max(-CAP,Math.min(CAP,(v[1]+f[1]*G)*DP));vel.set(x,v);
       {const B=box(x),w=B.w,h=B.h,fl=x.x>.72,nx=x.x*W+v[0],ny=x.y*H+v[1],lo=fl?w-8:24,hi=fl?W-24:W-w+8,yl=Math.max(70,h/2+8),yh=H-Math.max(34,h/2+8);x.x=Math.max(lo,Math.min(hi,nx))/W;x.y=Math.max(yl,Math.min(yh,ny))/H}e+=Math.hypot(v[0],v[1])});return e};
   const flow=()=>{raf=0;const e=step();
     stars.querySelectorAll('.cs').forEach(d=>{const x=byId(d.dataset.id);if(x&&x!==pin&&!d.querySelector('input')){d.style.left=(x.x*100)+'%';d.style.top=(x.y*100)+'%';d.classList.toggle('flip',x.x>.72)}});
     drawLines();
-    if(held||e>.5)raf=requestAnimationFrame(flow);else{vel.clear();persist();showTool()}};
+    if(held||e>.35)raf=requestAnimationFrame(flow);else{vel.clear();persist();showTool()}};
   const kick=()=>{ropes(true);if(!raf)raf=requestAnimationFrame(flow)};
-  const relax=(n)=>{ropes();for(let i=0;i<n;i++)if(step()<.3)break;vel.clear()};
+  const relax=(n)=>{ropes();for(let i=0;i<n;i++)if(step(true)<.3)break;vel.clear()};
   stars.addEventListener('pointerdown',e=>{const d=e.target.closest('.cs');if(!d||e.target.tagName==='INPUT')return;e.preventDefault();const x=byId(d.dataset.id);if(!x)return;
     const sx=e.clientX,sy=e.clientY,ox=x.x,oy=x.y;let moved=false;d.setPointerCapture(e.pointerId);
     const mv=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;if(!moved&&Math.hypot(dx,dy)<4)return;
