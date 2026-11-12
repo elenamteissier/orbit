@@ -899,7 +899,7 @@ function openPanel(n,el,parent){
     <div id="mgbox" style="display:none"><input class="name" id="mgq" placeholder="Search a bubble to merge with…" spellcheck="false"><div id="mgl"></div></div>
     <div class="row">
       <button class="btn primary" id="open">Open page</button>
-      <button class="btn" id="cons">✦ Constellation</button>
+      <button class="btn" id="consOpen">✦ Constellation</button>
       <button class="btn" id="mg">⛓ Merge with…</button>
       <button class="btn" id="mv">↪ Move to…</button>
       <a class="btn" id="go" target="_blank" rel="noopener" style="display:none;text-decoration:none">Website ↗</a>
@@ -1007,7 +1007,7 @@ function openPanel(n,el,parent){
     $$('#mv').onclick=()=>{const mb=$$('#mgbox');if(mb)mb.style.display='none';box.style.display=box.style.display==='none'?'block':'none';if(box.style.display==='block'){draw();q.focus()}};
     q.oninput=draw;
   }
-  $$('#cons').onclick=()=>openConstellation(n);
+  $$('#consOpen').onclick=()=>openConstellation(n);
   $$('#open').onclick=()=>{const t=[...trail,...(parent?[parent]:[]),n];save();location.hash=goHash(n,t)};
   let armed=false;
   $$('#del').onclick=e=>{
@@ -1232,12 +1232,28 @@ function openConstellation(n0){
     M.nodes=M.nodes.filter(q=>q.id!==id);M.links=M.links.filter(l=>l[0]!==id&&l[1]!==id);sel=null;persist();refresh()}
   function toggleLink(a,b){if(a===b)return;const i=M.links.findIndex(l=>(l[0]===a&&l[1]===b)||(l[0]===b&&l[1]===a));if(i>=0)M.links.splice(i,1);else M.links.push([a,b]);persist()}
   /* pointer: drag + click */
+  /* flowy ropes: linked stars (and moon tethers) trail behind a dragged star */
+  let raf=0,pin=null,held=false,pairs=[];
+  const stopFlow=()=>{cancelAnimationFrame(raf);raf=0};
+  const ropes=()=>{pairs=[];const add=(a,b)=>{if(!a||!b||a===b)return;const A=XY(a),B=XY(b);pairs.push([a,b,Math.hypot(A.x-B.x,A.y-B.y)])};
+    M.nodes.forEach(x=>{if(x.sub&&vis(x))add(x,byId('k'+x.sub))});M.links.forEach(l=>{const a=byId(l[0]),b=byId(l[1]);if(a&&b&&vis(a)&&vis(b))add(a,b)})};
+  const flow=()=>{raf=0;let e=0;
+    for(let k=0;k<2;k++)pairs.forEach(([a,b,L])=>{const A=XY(a),B=XY(b),dx=B.x-A.x,dy=B.y-A.y,d=Math.hypot(dx,dy);if(d<=L||d<.001)return;
+      const wa=a===pin?0:1,wb=b===pin?0:1,t=wa+wb;if(!t)return;const f=(d-L)/d*.16;
+      const mv=(n,sx,sy)=>{n.x=Math.max(.02,Math.min(.98,n.x+sx/W));n.y=Math.max(.08,Math.min(.97,n.y+sy/H));e+=Math.hypot(sx,sy)};
+      if(wa)mv(a,dx*f*wa/t,dy*f*wa/t);if(wb)mv(b,-dx*f*wb/t,-dy*f*wb/t)});
+    const seen=new Set();pairs.forEach(([a,b])=>{seen.add(a);seen.add(b)});
+    seen.forEach(x=>{if(x===pin)return;const d=stars.querySelector(`.cs[data-id="${x.id}"]`);if(d){d.style.left=(x.x*100)+'%';d.style.top=(x.y*100)+'%'}});
+    drawLines();
+    if(held||e>.4)raf=requestAnimationFrame(flow);else persist()};
   stars.addEventListener('pointerdown',e=>{const d=e.target.closest('.cs');if(!d||e.target.tagName==='INPUT')return;e.preventDefault();const x=byId(d.dataset.id);if(!x)return;
     const sx=e.clientX,sy=e.clientY,ox=x.x,oy=x.y;let moved=false;d.setPointerCapture(e.pointerId);
-    const mv=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;if(!moved&&Math.hypot(dx,dy)<4)return;moved=true;d.classList.add('drag');tool.classList.remove('on');
-      x.x=Math.max(.02,Math.min(.98,ox+dx/W));x.y=Math.max(.08,Math.min(.97,oy+dy/H));d.style.left=(x.x*100)+'%';d.style.top=(x.y*100)+'%';drawLines()};
-    const up=()=>{d.removeEventListener('pointermove',mv);d.removeEventListener('pointerup',up);d.classList.remove('drag');
-      if(moved){persist();sel=x.id;selLink=null;refresh();return}
+    const mv=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;if(!moved&&Math.hypot(dx,dy)<4)return;
+      if(!moved){moved=true;held=true;pin=x;ropes();d.classList.add('drag');tool.classList.remove('on')}
+      x.x=Math.max(.02,Math.min(.98,ox+dx/W));x.y=Math.max(.08,Math.min(.97,oy+dy/H));d.style.left=(x.x*100)+'%';d.style.top=(x.y*100)+'%';
+      if(!raf)raf=requestAnimationFrame(flow)};
+    const up=()=>{d.removeEventListener('pointermove',mv);d.removeEventListener('pointerup',up);d.classList.remove('drag');held=false;
+      if(moved){pin=null;persist();sel=x.id;selLink=null;if(!raf)raf=requestAnimationFrame(flow);refresh();return}
       if(connect){if(!src){src=x.id;selLink=null;refresh()}else{if(src!==x.id)toggleLink(src,x.id);src=null;refresh()}return}
       sel=(sel===x.id?null:x.id);selLink=null;refresh()};
     d.addEventListener('pointermove',mv);d.addEventListener('pointerup',up)});
@@ -1249,7 +1265,7 @@ function openConstellation(n0){
   tool.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.a;
     if(a==='cut'){M.links.splice(selLink,1);selLink=null;persist();refresh()}
     else if(a==='done'){const x=byId(sel);if(x.kid){const k=kidOf(x);if(k){k.progress=prog(k)>=100?0:100;k.pm='manual';persist();refresh()}}else{const t=tdOf(x);if(t){t.done=!t.done;persist();refresh()}}}
-    else if(a==='open'){const k=kidOf(byId(sel));if(k){persist();window.removeEventListener('keydown',key,true);window.removeEventListener('resize',rs);el.remove();openConstellation(k)}}
+    else if(a==='open'){const k=kidOf(byId(sel));if(k){stopFlow();persist();window.removeEventListener('keydown',key,true);window.removeEventListener('resize',rs);el.remove();openConstellation(k)}}
     else if(a==='edit')edit(sel);
     else if(a==='conn'){connect=true;src=sel;$c('#clink').classList.add('on');refresh()}
     else if(a==='del'){if(!b._arm){b._arm=1;b.textContent='Sure?';return}remove(sel)}});
@@ -1258,7 +1274,7 @@ function openConstellation(n0){
   $c('#csub').onclick=()=>{M.hideSub=!M.hideSub;if(sel&&byId(sel)&&!vis(byId(sel)))sel=null;persist();paintSub();refresh()};
   $c('#cadd').onclick=()=>addStar(false);$c('#cnote').onclick=()=>addStar(true);
   $c('#creset').onclick=e=>{const b=e.currentTarget;if(!b._arm){b._arm=1;b.textContent='Sure?';setTimeout(()=>{b._arm=0;b.textContent='✧ Tidy'},2500);return}b._arm=0;b.textContent='✧ Tidy';M.nodes.forEach(x=>{x.x=null;x.y=null});place();persist();refresh()};
-  const close=()=>{window.removeEventListener('keydown',key,true);window.removeEventListener('resize',rs);el.remove();persist();render()};
+  const close=()=>{stopFlow();window.removeEventListener('keydown',key,true);window.removeEventListener('resize',rs);el.remove();persist();render()};
   $c('#cx').onclick=close;
   const key=e=>{const typing=/INPUT|TEXTAREA/.test(document.activeElement.tagName);if(typing)return;e.stopPropagation();
     if(e.key==='Escape'){if(connect){connect=false;src=null;$c('#clink').classList.remove('on');refresh()}else if(sel||selLink!=null){sel=null;selLink=null;refresh()}else close()}
