@@ -68,6 +68,17 @@ Open it with **✦ Map** in the top bar (or **✦ Constellation** in a bubble's 
 
 The planner reads your Orbit data from the same browser, so open both pages from the same place.
 
+## Linking with Obsidian
+
+Every bubble can point to one of your Obsidian notes, so a project opens its note page in one click.
+
+1. Click a bubble to open its panel and find the **Link** field.
+2. Type the note like in Obsidian: `[[My note]]`, or with a folder `[[Projects/My note]]`. You can also paste a full `obsidian://open?…` link ("Copy Obsidian URL" in Obsidian).
+3. The first time you click the **Obsidian ↗** button, Orbit asks for the name of your vault (the vault name shown in Obsidian's vault switcher). It remembers it in your browser.
+4. Your browser may ask to open Obsidian once. After that, the note opens directly.
+
+Notes: Obsidian must be installed on the same computer. If the note isn't found, check the vault name and the folder path. To change the vault name later, clear the site data for the page or run `localStorage.removeItem('orbit-vault')` in the browser console.
+
 ## Saving your data
 
 - Changes are saved **automatically in your browser** (localStorage).
