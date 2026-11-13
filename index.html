@@ -357,7 +357,10 @@ html.light #clines .ln{filter:none;opacity:.7}
 .cs .g svg{width:100%;height:100%;display:block;overflow:visible}
 .cs .t{width:max-content;max-width:190px;font-size:12px;line-height:1.35;letter-spacing:.3px;text-shadow:0 0 8px var(--bg0),0 0 3px var(--bg0);word-break:break-word}
 .cs.done .g{opacity:.55;filter:drop-shadow(0 0 3px var(--c))}.cs.done .t{text-decoration:line-through;opacity:.55}
-.cs.note .g{color:var(--ink);opacity:.8;filter:drop-shadow(0 0 5px rgba(var(--w),.4))}.cs.note .t{font-style:italic;opacity:.9}
+.cs.note .g{cursor:pointer;color:var(--ink);opacity:.8;filter:drop-shadow(0 0 5px rgba(var(--w),.4))}.cs.note .t{font-style:italic;opacity:.9}
+.cs.note .g:hover{transform:scale(1.35) rotate(45deg);transition:.25s}
+@keyframes cpop{0%{transform:scale(.3) rotate(-90deg);filter:brightness(2.5)}60%{transform:scale(1.5) rotate(20deg)}100%{transform:scale(1)}}
+.cs.pop .g{animation:cpop .6s cubic-bezier(.2,1.4,.4,1)}
 .cs.cmoon .t{font-weight:600;letter-spacing:.6px}
 .cs.sel{background:rgba(var(--w),.06);border-radius:14px;outline:1px dashed color-mix(in srgb,var(--c) 70%,transparent)}
 .cs.src .g{transform:scale(1.5)}
@@ -1246,7 +1249,7 @@ function openConstellation(n0){
     M.nodes.forEach(x=>{if(!vis(x))return;const d=document.createElement('div');const dn=isDone(x);
       d.className='cs'+((x.ref||x.kid)?'':' note')+(isMoon(x)?' cmoon':'')+(dn?' done':'')+(sel===x.id?' sel':'')+(src===x.id?' src':'')+(x.x>.72?' flip':'');d.dataset.id=x.id;
       d.style.left=(x.x*100)+'%';d.style.top=(x.y*100)+'%';d.style.setProperty('--sz',(isMoon(x)?30:(x.ref||x.kid)?18+hash(x.id)%9:16)+'px');if(isMoon(x))d.style.setProperty('--c',`var(--p${kidOf(x).c})`);else if(x.sub){const tp=allB.get(x.sub);if(tp)d.style.setProperty('--c',`var(--p${tp.c})`)}
-      d.innerHTML=`<span class="g">${GL(dn,!x.ref&&!x.kid,isMoon(x))}</span><span class="t"></span>`;d.querySelector('.t').textContent=label(x)||(x.ref?'(empty to-do)':'(empty note)');
+      d.innerHTML=`<span class="g"${(x.ref||x.kid)?'':' title="Click to turn this note into a star (to-do)"'}>${GL(dn,!x.ref&&!x.kid,isMoon(x))}</span><span class="t"></span>`;d.querySelector('.t').textContent=label(x)||(x.ref?'(empty to-do)':'(empty note)');
       stars.appendChild(d)});
     const st=todoStats(n);$c('#cinfo').textContent=M.nodes.filter(vis).length+' stars · '+st.d+'/'+st.t+' done'}
   function persist(){save()}
@@ -1267,6 +1270,7 @@ function openConstellation(n0){
     if(note){x={id:'n'+uid(),x:p.x,y:p.y,text:'New note'};M.nodes.push(x)}
     else{const t={id:uid(),text:'New to-do',done:false,due:''};todos.push(t);x={id:'s'+t.id,ref:t.id,x:p.x,y:p.y};M.nodes.push(x)}
     sel=x.id;selLink=null;persist();refresh();edit(x.id)}
+  function toStar(id){const x=byId(id);if(!x||x.ref||x.kid)return;const t={id:uid(),text:(x.text||'').trim()||'New to-do',done:false,due:''};todos.push(t);x.ref=t.id;delete x.text;sel=x.id;selLink=null;persist();refresh();const e=stars.querySelector(`.cs[data-id="${x.id}"]`);if(e){e.classList.add('pop');setTimeout(()=>e.classList.remove('pop'),700)}}
   function remove(id){const x=byId(id);if(!x)return;if(x.ref){const o=ownerOf(x),arr=o&&o.todos||[],i=arr.findIndex(q=>q.id===x.ref);if(i>=0)arr.splice(i,1)}
     M.nodes=M.nodes.filter(q=>q.id!==id);M.links=M.links.filter(l=>l[0]!==id&&l[1]!==id);sel=null;persist();refresh()}
   function toggleLink(a,b){if(a===b)return;const i=M.links.findIndex(l=>(l[0]===a&&l[1]===b)||(l[0]===b&&l[1]===a));if(i>=0)M.links.splice(i,1);else M.links.push([a,b]);persist()}
@@ -1296,13 +1300,14 @@ function openConstellation(n0){
   const kick=()=>{ropes(true);if(!raf)raf=requestAnimationFrame(flow)};
   const relax=(n)=>{ropes();for(let i=0;i<n;i++)if(step(true)<.3)break;vel.clear()};
   stars.addEventListener('pointerdown',e=>{const d=e.target.closest('.cs');if(!d||e.target.tagName==='INPUT')return;e.preventDefault();const x=byId(d.dataset.id);if(!x)return;
-    const sx=e.clientX,sy=e.clientY,ox=x.x,oy=x.y;let moved=false;d.setPointerCapture(e.pointerId);
+    const sx=e.clientX,sy=e.clientY,ox=x.x,oy=x.y,onG=!!e.target.closest('.g')&&!x.ref&&!x.kid;let moved=false;d.setPointerCapture(e.pointerId);
     const mv=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;if(!moved&&Math.hypot(dx,dy)<4)return;
       if(!moved){moved=true;held=true;pin=x;ropes();vel.clear();d.classList.add('drag');tool.classList.remove('on')}
       x.x=Math.max(.02,Math.min(.98,ox+dx/W));x.y=Math.max(.08,Math.min(.97,oy+dy/H));d.style.left=(x.x*100)+'%';d.style.top=(x.y*100)+'%';
       if(!raf)raf=requestAnimationFrame(flow)};
     const up=()=>{d.removeEventListener('pointermove',mv);d.removeEventListener('pointerup',up);d.classList.remove('drag');held=false;
       if(moved){pin=null;persist();sel=x.id;selLink=null;if(!raf)raf=requestAnimationFrame(flow);refresh();return}
+      if(onG&&!connect){toStar(x.id);return}
       if(connect){if(!src){src=x.id;selLink=null;refresh()}else{if(src!==x.id)toggleLink(src,x.id);src=null;refresh()}return}
       sel=(sel===x.id?null:x.id);selLink=null;refresh()};
     d.addEventListener('pointermove',mv);d.addEventListener('pointerup',up)});
